@@ -8,19 +8,22 @@
 #define MAX_NUM_LIVROS 20
 
 
-char Menu_Pincipal(void);
-char Registar_Livro(int);
-char Registar_Leitor(void);
-char Requisitar_Livro(void);
-char Devolver_Livro(void);
-char Listagens(void);
-char keyboard_Read_dec();
 
 //char Confirm_Exit(void);
+
+uint8_t Total_Livros;
+uint8_t Total_Leitores;
+uint8_t Total_Requisicoes;
 
 int livro_count=0;
 
 //ESTRUTURAS DE DADOS
+
+typedef enum{
+    AVAILABLE,
+    REQUESTED,
+    UNUSABLE
+} Status;
 
 typedef struct {
     char ISBN[14];
@@ -38,6 +41,14 @@ typedef struct {
     int contato_telefonico;
 } Leitor_t;
 
+char Menu_Pincipal(void);
+char Registar_Livro(Livro_t*);
+char Registar_Leitor(void);
+char Requisitar_Livro(void);
+char Devolver_Livro(void);
+char Listagens(void);
+char keyboard_Read_dec();
+
 void main(){
 
     char menu1, menu2;
@@ -52,7 +63,7 @@ void main(){
 
                 Livro_t livro[MAX_NUM_LIVROS];
                 //enviar so k
-                menu2 = Registar_Livro(k);
+                menu2 = Registar_Livro(&livro);
                 livro_count++;
 
             } while (menu2 != '0');
@@ -165,8 +176,8 @@ char Menu_Pincipal()
              printf("\t");
             }
     printf("    %c\n",186);
-    printf( "%c\tTotal de Livros \t\t\tTotal de Leitores: \t\t\t    %c\n",186,186 );
-    printf( "%c\tTotal de Requisi%c%ces ativas: **\t",186,135,228);
+    printf( "%c\tTotal de Livros:%d \t\t\tTotal de Leitores:%d \t\t\t    %c\n",186,Total_Livros,Total_Leitores,186 );
+    printf( "%c\tTotal de Requisi%c%ces ativas:%d\t",186,135,228,Total_Requisicoes);
     for (i = 1; i < 7; i++) {
              printf("\t");
             }
@@ -193,7 +204,7 @@ char Menu_Pincipal()
     return menu;
 }
 
-char Registar_Livro(k){
+char Registar_Livro(Livro_t *livro){
     char menu;
     uint8_t i;
 
@@ -220,11 +231,16 @@ char Registar_Livro(k){
              printf("%c",205);
             }
     printf("%c",188);
-    printf("\n\n\t%c ISBN: \n",175);
-    printf("\t%c Titulo do Livro: \n",175);
-    printf("\t%c Autor do Livro: \n",175);
-    printf("\t%c Editor do Livro: \n",175);
+    printf("\n\n\t%c ISBN: ",175);
+    fgets(livro->ISBN, sizeof(livro->ISBN), stdin);
+    printf("\t%c Titulo do Livro: ",175);
+    fgets(livro->titlo, sizeof(livro->titlo), stdin);
+    printf("\t%c Autor do Livro: ",175);
+    fgets(livro->autor, sizeof(livro->autor), stdin);
+    printf("\t%c Editor do Livro: ",175);
+    fgets(livro->editora, sizeof(livro->editora), stdin);
     printf("\t%c Estado do Livro: \n\n",175);
+    //livro->estado = AVAILABLE;
     printf("\tDeseja confirmar registo%? [Y/N]\n");
     printf("\tDeseja Continuar%? [Y/N] ");
 
@@ -331,7 +347,7 @@ char keyboard_Read_dec(){
         printf("\t\tOP%c%cO: ",128,199);
         gets(data_dec);
     }while(!(isdigit(data_dec[0])));
-    
+
     return data_dec[0];
 }
 
