@@ -36,7 +36,7 @@ inutilizado
 5. Listagens
 Esta opção deverá apresentar um submenu com as seguintes opções:
 ▪ Listagem de todos os dados de todos os Livros.
-▪ Listagem de todos os dados de todos os Leitores.3
+▪ Listagem de todos os dados de todos os Leitores.
 ▪ Listagem dos livros já requisitados e no final a quantidade total desses livros.
 ▪ Listagem das 10 últimas requisições efetuadas por um determinado leitor.
 
@@ -56,11 +56,10 @@ carregados para o programa.
 #include <stdint.h>
 #include <windows.h>
 #include <conio.h>
+#include <unistd.h>
 
-#define MAX_NUM_LIVROS 20 
+#define MAX_NUM_LIVROS 20
 #define MAX_NUM_LEITORES 20
-
-//char Confirm_Exit(void);
 
 uint8_t Total_Livros;
 uint8_t Total_Leitores;
@@ -79,20 +78,24 @@ typedef struct {
 } Livro_t;
 
 typedef struct {
-    int codigo_leitor;
+    char codigo_leitor[20];
     char nome[50];
     char data_nascimento[11];
     char localidade[50];
-    int contato_telefonico;
+    char contato_telefonico[9];
 } Leitor_t;
 
 char Menu_Pincipal(void);
-char Registar_Livro(Livro_t livro[], int livro_count);
-char Registar_Leitor(Leitor_t leitor[], int leitor_count);
+char Registar_Livro(Livro_t livro[]);
+char Registar_Leitor(Leitor_t leitor[]);
 char Requisitar_Livro(void);
 char Devolver_Livro(void);
-char Listagens(void);
+void listagem_livros(Livro_t livro[], int livro_count);
+void listagem_leitores(Leitor_t leitor[], int leitor_count);
+void listagem_livros_requisitados(Livro_t livro[], int livro_count);
+void listagem_ultimas_requisicoes(Leitor_t leitor[], int leitor_count);
 char keyboard_Read_dec();
+char S_or_N(void);
 
 void main(){
 
@@ -101,41 +104,56 @@ void main(){
     Livro_t livro[MAX_NUM_LIVROS];
     Leitor_t leitor[MAX_NUM_LEITORES];
 
-    load_data(livro, leitor, &livro_count, &leitor_count);
+    //Copies the character 0 to the first n characters of the string pointed to, by the argument str.
+    memset(&livro, 0, sizeof(livro));   //Coloca todos os bytes da estrutura a 0
+    memset(&leitor, 0, sizeof(leitor)); //Coloca todos os bytes da estrutura a 0
 
-    
+    load_data(&livro,&leitor);//load the data from the file
+
+    //Check the struck and count the number of books and readers
+    for (int i = 0; i < MAX_NUM_LIVROS; i++){
+        if (livro[i].ISBN[0] != 0){
+            livro_count++;
+        }
+    }
+
+    for (int i = 0; i < MAX_NUM_LEITORES; i++){
+        if (leitor[i].codigo_leitor[0] != 0){
+            leitor_count++;
+        }
+    }
 
     do{
         menu1 = Menu_Pincipal();
         switch (menu1){
         case '1':
             do{
-                menu2 = Registar_Livro(livro, livro_count);
+                menu2 = Registar_Livro(livro);
 
-            } while (menu2 != '0');
+            }while (menu2 != 0);
             break;
         case '2':
             do{
-                menu2 = Registar_Leitor(leitor, leitor_count);
+                menu2 = Registar_Leitor(leitor);
 
-            } while (menu2 != '0');
+            } while (menu2 != 0);
             break;
         case '3':
             do{
                 menu2 = Requisitar_Livro();
-                
+
             } while (menu2 != '0');
             break;
         case '4':
             do{
                 menu2 = Devolver_Livro();
-                
+
             } while (menu2 != '0');
             break;
 
         case '5':
             do{
-                menu2 = Listagens();
+               // menu2 = Listagens();
 
             } while (menu2 != '0');
             break;
@@ -146,8 +164,13 @@ void main(){
             break;
         }
     } while (menu1 != 'S' && menu1 != 's' );
-    printf("FIM");
-    return 0;
+
+    system("cls");
+
+    save_data(&livro,&leitor);
+
+
+    printf("\n\n\n\t\t-----FIM-----\n\n\n");
 }
 
 char Menu_Pincipal(){
@@ -172,7 +195,7 @@ char Menu_Pincipal(){
         printf("\t");
     }
     printf("    %c\n", 186); // linha vertical
-    printf("%c\tTotal de Livros:%d \t\t\tTotal de Leitores:%d \t\t\t    %c\n", 186, Total_Livros, Total_Leitores, 186);
+    printf("%c\tTotal de Livros:%d \t\t\tTotal de Leitores:%d \t\t\t    %c\n", 186, livro_count, leitor_count, 186);
     printf("%c\tTotal de Requisi%c%ces ativas:%d\t", 186, 135, 228, Total_Requisicoes);
     for (uint8_t i = 1; i < 7; i++){
         printf("\t");
@@ -194,7 +217,7 @@ char Menu_Pincipal(){
     printf("\t%c 3-Requisitar Livro\n", 175);
     printf("\t%c 4-Devolver Livro\n", 175);
     printf("\t%c 5-Listagens\n", 175);
-    printf("\t%c 0-Sair\n\n", 175);
+    printf("\t%c S-Sair\n\n", 175);
     printf("\t\tOP%c%cO: ", 128, 199);
     // ################################
 
@@ -202,7 +225,7 @@ char Menu_Pincipal(){
     return menu;
 }
 
-char Registar_Livro(Livro_t livro[], int livro_count){
+char Registar_Livro(Livro_t livro[]){
 
     //############## UI ##############
     system("cls");
@@ -231,61 +254,61 @@ char Registar_Livro(Livro_t livro[], int livro_count){
     //################################
 
     char menu;
-    int numero_livro;
-    numero_livro++;
-    
+    livro_count++;
+
     printf("\n\n\t%c ISBN: ",175);
-    fgets(livro[numero_livro].ISBN, sizeof(livro->ISBN), stdin);
+    fgets(livro[livro_count].ISBN, sizeof(livro->ISBN), stdin);
 
     printf("\t%c Titulo do Livro: ",175);
-    fgets(livro[numero_livro].titulo, sizeof(livro->titulo), stdin);
+    fgets(livro[livro_count].titulo, sizeof(livro->titulo), stdin);
 
     printf("\t%c Autor do Livro: ",175);
-    fgets(livro[numero_livro].autor, sizeof(livro->autor), stdin);
+    fgets(livro[livro_count].autor, sizeof(livro->autor), stdin);
 
     printf("\t%c Editora do Livro: ",175);
-    fgets(livro[numero_livro].editora, sizeof(livro->editora), stdin);
+    fgets(livro[livro_count].editora, sizeof(livro->editora), stdin);
 
     printf("\t%c Estado do Livro: DISPONIVEL\n\n",175);
     //livro->estado = AVAILABLE;
 
-    printf("\tDeseja confirmar registo%? [S/N]\n");
-    switch (S_or_N()){
+    printf("\tDeseja confirmar registo%? [S/N]");
+
+    char sim_nao= S_or_N();
+    switch (sim_nao){
     case 'S':
         printf("\n\tLivro Registado com Sucesso!\n\n");
+        usleep(500000); //delay de 500ms
 
         break;
     case 'N':
         for(int i=0;i<100;i++){
-            livro[numero_livro].ISBN[i] = 0;
-            livro[numero_livro].titulo[i] = 0;
-            livro[numero_livro].autor[i] = 0;
-            livro[numero_livro].editora[i] = 0;
-            livro[numero_livro].estado = 0;
+            livro[livro_count].ISBN[i] = 0;
+            livro[livro_count].titulo[i] = 0;
+            livro[livro_count].autor[i] = 0;
+            livro[livro_count].editora[i] = 0;
+            livro[livro_count].estado = 0;
         }
-        numero_livro--;
+        livro_count--;
         printf("\n\tLivro N%co Registado!\n\n",198);
+        usleep(500000); //delay de 500ms
         break;
     }
 
     printf("\tDeseja Continuar%? [S/N] ");
-    switch (S_or_N()){
-    case 'S':
+
+    char sim_nao2 = S_or_N();
+
+    if(sim_nao2 == 'S'){
         menu = 1;
         return menu;
-        break;
-    case 'N':
+    }
+    else if(sim_nao2 == 'N'){
         menu = 0;
         return menu;
-        break;
     }
-
-    menu = keyboard_Read_dec();
-    return menu;
 }
 
-char Registar_Leitor(Leitor_t leitor[],int leitor_count){
-    char menu;
+char Registar_Leitor(Leitor_t leitor[]){
 
     //############## UI ##############
     system("cls");
@@ -313,17 +336,60 @@ char Registar_Leitor(Leitor_t leitor[],int leitor_count){
     printf("%c",188);
     //################################
 
-    printf("\n\n\t%c Codigo do Leitor \n",175);
-    printf("\t%c Nome: \n",175);
-    printf("\t%c Data nascimento: \n",175);
-    printf("\t%c Localidade: \n",175);
-    printf("\t%c Numero Telemovel: \n",175);
-    printf("\t%c Email: **\n\n",175);
-    printf("\tDeseja confirmar registo%? [Y/N]\n");
-    printf("\tDeseja Continuar%? [Y/N] ");
+    char menu;
+    leitor_count++;
 
-    menu = keyboard_Read_dec();
-    return menu;
+    printf("\n\n\t%c Codigo de Leitor: ",175);
+    fgets(leitor[leitor_count].codigo_leitor, sizeof(leitor->codigo_leitor), stdin);
+
+    printf("\t%c Nome: ",175);
+    fgets(leitor[leitor_count].nome, sizeof(leitor->nome), stdin);
+
+    printf("\t%c Data nascimento: ",175);
+    fgets(leitor[leitor_count].data_nascimento, sizeof(leitor->data_nascimento), stdin);
+
+    printf("\t%c Localidade: ",175);
+    fgets(leitor[leitor_count].localidade, sizeof(leitor->localidade), stdin);
+
+    printf("\t%c Numero de Telefone: ",175);
+    fgets(leitor[leitor_count].contato_telefonico, sizeof(leitor->contato_telefonico), stdin);
+
+    //printf("\t%c Email: **\n\n",175);
+
+    printf("\tDeseja confirmar registo%? [S/N]");
+    char sim_nao= S_or_N();
+    switch (sim_nao){
+    case 'S':
+        printf("\n\tLeitor Registado com Sucesso!\n\n");
+        usleep(500000); //delay de 500ms
+
+        break;
+    case 'N':
+        for(int i=0;i<100;i++){
+            leitor[leitor_count].codigo_leitor[i] = 0;
+            leitor[leitor_count].nome[i] = 0;
+            leitor[leitor_count].data_nascimento[i] = 0;
+            leitor[leitor_count].localidade[i] = 0;
+            leitor[leitor_count].contato_telefonico[i]= 0;
+        }
+        leitor_count--;
+        printf("\n\tLeitor N%co Registado!\n\n",198);
+        usleep(500000); //delay de 500ms
+        break;
+    }
+
+    printf("\tDeseja Continuar%? [S/N] ");
+
+    char sim_nao2 = S_or_N();
+
+    if(sim_nao2 == 'S'){
+        menu = 1;
+        return menu;
+    }
+    else if(sim_nao2 == 'N'){
+        menu = 0;
+        return menu;
+    }
 }
 
 char Requisitar_Livro(){
@@ -358,7 +424,7 @@ char Devolver_Livro(){
     menu = keyboard_Read_dec();
     return menu;
 }
-
+/*
 char Listagens(){
     char menu;
     system("cls");
@@ -373,8 +439,9 @@ char Listagens(){
     menu = keyboard_Read_dec();
     return menu;
 }
-
+*/
 char keyboard_Read_dec(){
+
     char data_dec[10];
 
     fflush(stdin);
@@ -383,10 +450,11 @@ char keyboard_Read_dec(){
         printf("\33[2K\r");
         //data_dec = _getch();
         printf("\t\tOP%c%cO: ",128,199);
-        gets(data_dec);
-    }while(!(isdigit(data_dec[0]) && data_dec[0] != '\0'));
+        fgets(data_dec, sizeof(data_dec), stdin);
+        //gets(data_dec);
+    }while (!(isdigit(data_dec[0]) || toupper(data_dec[0]) == 'S') || data_dec[1] != '\n');
 
-    return data_dec[0];
+    return toupper(data_dec[0]);
 }
 
 char keyboard_Read_str(){
@@ -399,26 +467,31 @@ char keyboard_Read_str(){
     return data_srt;
 }
 
-void load_data(Livro_t *livros, int num_livros, Leitor_t *leitores, int num_leitores) {
+void load_data(Livro_t *livros, Leitor_t *leitores) {
+    //ler ficheiro binario e se nao existir criar um novo
     FILE *fileptr = fopen("data.dat", "rb");
     if (fileptr == NULL) {
+        fileptr = fopen("data.dat", "wb");
         printf("Erro a abrir o ficheiro!\n");
+        fclose(fileptr);
         return;
     }
-    fread(livros, sizeof(Livro_t), num_livros, fileptr);
-    fread(leitores, sizeof(Leitor_t), num_leitores, fileptr);
+    fread(livros, sizeof(Livro_t), MAX_NUM_LIVROS, fileptr);
+    fread(leitores, sizeof(Leitor_t), MAX_NUM_LEITORES, fileptr);
     fclose(fileptr);
 }
 
-void save_data(Livro_t *livros, int num_livros, Leitor_t *leitores, int num_leitores) {
+void save_data(Livro_t *livros, Leitor_t *leitores) {
+    //guardar ficheiro binario
     FILE *fileptr = fopen("data.dat", "wb");
     if (fileptr == NULL) {
         printf("Erro a guardar o ficheiro!\n");
         return;
     }
-    fwrite(livros, sizeof(Livro_t), num_livros, fileptr);
-    fwrite(leitores, sizeof(Leitor_t), num_leitores, fileptr);
+    fwrite(livros, sizeof(Livro_t), MAX_NUM_LIVROS, fileptr);
+    fwrite(leitores, sizeof(Leitor_t), MAX_NUM_LEITORES, fileptr);
     fclose(fileptr);
+    printf("\n\tDados guardados com sucesso!\n");
 }
 
 void gotoxy(int x, int y){
@@ -429,11 +502,11 @@ void gotoxy(int x, int y){
 }
 
 char S_or_N(void){
-    char c;
+    //recebe S ou N e retorna S ou N
+    char c[10];
     do{
-        fflush(stdin);
-        scanf("%c",&c);
-        toupper(c);
-    }while(!(c == 'S' || c == 'N'));
-    return c;
+        fgets(c, sizeof(c), stdin);
+    }while(!(c[0] == 'S' || c[0] == 'N' || c[0] == 's' || c[0] == 'n' || c[0] == '0' || c[1]=='\n'));
+
+    return toupper(c[0]);
 }
