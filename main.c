@@ -90,11 +90,12 @@ char Registar_Livro(Livro_t livro[]);
 char Registar_Leitor(Leitor_t leitor[]);
 char Requisitar_Livro(void);
 char Devolver_Livro(void);
-void listagem_livros(Livro_t livro[], int livro_count);
-void listagem_leitores(Leitor_t leitor[], int leitor_count);
-void listagem_livros_requisitados(Livro_t livro[], int livro_count);
-void listagem_ultimas_requisicoes(Leitor_t leitor[], int leitor_count);
-char keyboard_Read_dec();
+char Listagens(void);
+void Listagem_livros(Livro_t livro[]);
+void Listagem_leitores(Leitor_t leitor[]);
+void Listagem_livros_requisitados(Livro_t livro[]);
+void Listagem_ultimas_requisicoes(Leitor_t leitor[]);
+char keyboard_Read();
 char S_or_N(void);
 
 void main(){
@@ -148,12 +149,28 @@ void main(){
             do{
                 menu2 = Devolver_Livro();
 
+
             } while (menu2 != '0');
             break;
 
         case '5':
             do{
-               // menu2 = Listagens();
+                menu2 = Listagens();
+
+                switch (menu2){
+                case '1':
+                    Listagem_livros(livro);
+                    break;
+                case '2':
+                    Listagem_leitores(leitor);
+                    break;
+                case '3':
+                    Listagem_livros_requisitados(livro);
+                    break;
+                case '4':
+                    Listagem_ultimas_requisicoes(leitor);
+                    break;
+                }
 
             } while (menu2 != '0');
             break;
@@ -221,7 +238,7 @@ char Menu_Pincipal(){
     printf("\t\tOP%c%cO: ", 128, 199);
     // ################################
 
-    menu = keyboard_Read_dec();
+    menu = keyboard_Read();
     return menu;
 }
 
@@ -405,7 +422,7 @@ char Requisitar_Livro(){
     printf("\tDeseja confirmar requisicao%? [Y/N]\n");
     printf("\tDeseja Continuar%? [Y/N] ");
 
-    menu = keyboard_Read_dec();
+    menu = keyboard_Read();
     return menu;
 }
 
@@ -421,26 +438,190 @@ char Devolver_Livro(){
     printf("\tDeseja confirmar devolucao%? [S/N]\n");
     printf("\tDeseja Continuar%? [S/N] ");
 
-    menu = keyboard_Read_dec();
+    menu = keyboard_Read();
     return menu;
 }
-/*
-char Listagens(){
+
+char Listagens(void){
+//menu para apresentar as listagens
     char menu;
     system("cls");
     printf("\n\t\t\t-- Listagens --\n\n");
 
-    printf("\t1-Lista dos Livros\n");
-    printf("\t2-Lista de Leitores\n");
-    printf("\t3-Lista de Livros\n");
-    printf("\t4-Ultimas Requisicoes\n\n");
-    printf("\t0-Voltar");
+    printf("\t1 - Listagem de Livros\n");
+    printf("\t2 - Listagem de Leitores\n");
+    printf("\t3 - Listagem de Requisicoes\n");
+    printf("\t4 - Listagem de ultimas Requisicoes\n\n");
+    printf("\tOpcao: ");
 
-    menu = keyboard_Read_dec();
+    menu = keyboard_Read();
     return menu;
 }
-*/
-char keyboard_Read_dec(){
+
+void Listagem_livros(Livro_t livro[]){
+
+    //############## UI ##############
+    system("cls");
+    printf("%c", 201);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n", 187);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c\n", 186);
+    printf("%c\t\t\t-- Lista de Livros --\t\t\t   %c\n", 186, 186);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c", 186);
+    printf("\n%c", 200);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n\n", 188);
+    printf("\t1: ");
+    printf("\n\n\n\n\t2: ");
+    //################################
+
+    char menu;
+
+
+    menu = keyboard_Read();
+
+    return menu;
+}
+
+void Listagem_leitores(Leitor_t leitor[]){
+    //############## UI ##############
+    system("cls");
+    printf("%c", 201);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n", 187);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c\n", 186);
+    printf("%c\t\t\t-- Lista de Leitores --\t\t\t   %c\n", 186, 186);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c", 186);
+    printf("\n%c", 200);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n\n", 188);
+    printf("\t1: ");
+    printf("\n\n\n\n\t2: ");
+    //################################
+
+    char menu;
+
+}
+
+void Listagem_livros_requisitados(Livro_t livro[]){
+    //############## UI ##############
+    system("cls");
+    printf("%c", 201);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n", 187);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c\n", 186);
+    printf("%c\t\t\t-- Lista de Livros Requisitados --\t\t   %c\n", 186, 186);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c", 186);
+    printf("\n%c", 200);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n\n", 188);
+    printf("\t1: ");
+    printf("\n\n\n\n\t2: ");
+    //################################
+
+    char menu;
+}
+
+void Listagem_ultimas_requisicoes(Leitor_t leitor[]){
+    //############## UI ##############
+    system("cls");
+    printf("%c", 201);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n", 187);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c\n", 186);
+    printf("%c\t\t\t-- Lista de Ultimas Requisicoes --\t\t   %c\n", 186, 186);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c", 186);
+    printf("\n%c", 200);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n\n", 188);
+    printf("\t1: ");
+    printf("\n\n\n\n\t2: ");
+    //################################
+
+    char menu;
+}
+
+void Listagem_requisicoes(Leitor_t leitor[]){
+    //############## UI ##############
+    system("cls");
+    printf("%c", 201);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n", 187);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c\n", 186);
+    printf("%c\t\t\t-- Lista de Requisicoes --\t\t\t   %c\n", 186, 186);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c", 186);
+    printf("\n%c", 200);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n\n", 188);
+    printf("\t1: ");
+    printf("\n\n\n\n\t2: ");
+    //################################
+
+    char menu;
+
+}
+
+char keyboard_Read(){
 
     char data_dec[10];
 
