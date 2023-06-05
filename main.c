@@ -131,26 +131,26 @@ void main(){
             do{
                 menu2 = Registar_Livro(livro);
 
-            }while (menu2 != 0);
+            }while (menu2 != 0 && menu2 != '0');
             break;
         case '2':
             do{
                 menu2 = Registar_Leitor(leitor);
 
-            } while (menu2 != 0);
+            } while (menu2 != 0 && menu2 != '0');
             break;
         case '3':
             do{
                 menu2 = Requisitar_Livro(leitor, livro);
 
-            } while (menu2 != 0);
+            } while (menu2 != 0 && menu2 != '0');
             break;
         case '4':
             do{
                 menu2 = Devolver_Livro();
 
 
-            } while (menu2 != 0);
+            } while (menu2 != 0 && menu2 != '0');
             break;
 
         case '5':
@@ -172,7 +172,7 @@ void main(){
                     break;
                 }
 
-            } while (menu2 != 0);
+            } while (menu2 != 0 && menu2 != '0');
             break;
 
         case '0':
@@ -444,23 +444,25 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[]){
     //percorrer o array de leitores e verificar se o codigo existe
     char codigo_leitor_compare[100];
     fgets(codigo_leitor_compare, sizeof(codigo_leitor_compare), stdin);
+
     for(int i=0;i<leitor_count;i++){
         if(strcmp(codigo_leitor_compare,leitor[i].codigo_leitor)==0){
             printf("\tIntroduzir codigo existente%!\n");
             //mostrar codigos existentes
             for(int i=0;i<leitor_count;i++){
-                    printf("Codigos disponiveis:\n")
+                    printf("Codigos disponiveis:\n");
                     printf("\tCodigo: %s\n",leitor[i].codigo_leitor);
             }
-            if(leitor_count==0){
-                printf("\tNao existem codigos disponiveis!\n");
-                printf("\tA voltar ao menu principal...")
-                sleep(1);
-                menu = 0;
-                return menu;
-            }
-            break;
         }
+    }
+
+    if (leitor_count == 0){
+        printf("\tNao existem codigos disponiveis!\n");
+        printf("\tA voltar ao menu principal...");
+        sleep(1);
+        menu = 0;
+        return menu;
+    }
         else{
             printf("\tDeseja Registar novo Leitor%? [Y/N]\n");
             char sim_nao2 = S_or_N();
@@ -473,9 +475,8 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[]){
                 menu = 0;
                 return menu;
             }
-            break;
         }
-    }
+
 
     printf("\tIntroduzir codigo existente%! [Y/N]\n");
     printf("\tDeseja Registar novo Leitor%? [Y/N]\n");
@@ -538,6 +539,7 @@ char Listagens(void){
     printf("\t2 - Lista de Leitores\n");
     printf("\t3 - Lista de Requisicoes\n");
     printf("\t4 - Lista de ultimas Requisicoes\n\n");
+    printf("\t0 - Voltar ao menu principal\n\n");
     printf("\tOpcao: ");
 
     menu = keyboard_Read();
@@ -629,7 +631,7 @@ void Listagem_leitores(Leitor_t leitor[]){
         printf("-----------------------------\n");
     }
     if (leitor_count == 0){
-        printf("Nao existem leitores registados!\n");
+        printf("\n\tNao existem leitores registados!\n");
     }
 
     printf("\n\n\tPressione qualquer tecla para voltar ao menu das listagens...");
@@ -807,7 +809,7 @@ char S_or_N(void){
     char c[10];
     do{
         fgets(c, sizeof(c), stdin);
-    }while(!(c[0] == 'S' || c[0] == 'N' || c[0] == 's' || c[0] == 'n' || c[0] == '0' || c[1]=='\n'));
+    }while(!(toupper(c[0]) == 'S' || toupper(c[0]) == 'N') || c[1] != '\n');
 
     return toupper(c[0]);
 }
