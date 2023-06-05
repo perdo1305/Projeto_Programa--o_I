@@ -74,7 +74,7 @@ typedef struct {
     char titulo[100];
     char autor[100];
     char editora[100];
-    int estado;
+    char estado[1]; //D-disponivel, R-requisitado, I-inutilizado
 } Livro_t;
 
 typedef struct {
@@ -88,7 +88,7 @@ typedef struct {
 char Menu_Pincipal(void);
 char Registar_Livro(Livro_t livro[]);
 char Registar_Leitor(Leitor_t leitor[]);
-char Requisitar_Livro(void);
+char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[]);
 char Devolver_Livro(void);
 char Listagens(void);
 void Listagem_livros(Livro_t livro[]);
@@ -141,16 +141,16 @@ void main(){
             break;
         case '3':
             do{
-                menu2 = Requisitar_Livro();
+                menu2 = Requisitar_Livro(leitor, livro);
 
-            } while (menu2 != '0');
+            } while (menu2 != 0);
             break;
         case '4':
             do{
                 menu2 = Devolver_Livro();
 
 
-            } while (menu2 != '0');
+            } while (menu2 != 0);
             break;
 
         case '5':
@@ -172,7 +172,7 @@ void main(){
                     break;
                 }
 
-            } while (menu2 != '0');
+            } while (menu2 != 0);
             break;
 
         case '0':
@@ -286,7 +286,7 @@ char Registar_Livro(Livro_t livro[]){
     fgets(livro[livro_count].editora, sizeof(livro->editora), stdin);
 
     printf("\t%c Estado do Livro: DISPONIVEL\n\n",175);
-    //livro->estado = AVAILABLE;
+    livro[livro_count].estado[0] = 'D';
 
     printf("\tDeseja confirmar registo%? [S/N]");
 
@@ -303,7 +303,7 @@ char Registar_Livro(Livro_t livro[]){
             livro[livro_count].titulo[i] = 0;
             livro[livro_count].autor[i] = 0;
             livro[livro_count].editora[i] = 0;
-            livro[livro_count].estado = 0;
+            livro[livro_count].estado[i] = 0;
         }
         livro_count--;
         printf("\n\tLivro N%co Registado!\n\n",198);
@@ -409,12 +409,74 @@ char Registar_Leitor(Leitor_t leitor[]){
     }
 }
 
-char Requisitar_Livro(){
-    char menu;
-    system("cls");
-    printf("\n\t\t\t-- Requisitar livro --\n\n");
+char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[]){
 
-    printf("\tCodigo do Leitor **\n");
+    //############## UI ##############
+    system("cls");
+    printf("%c",201);
+    for (uint8_t i = 1; i < 67; i++) {
+             printf("%c",205);
+            }
+    printf("%c\n",187);
+    printf("%c",186);
+    for (uint8_t i = 1; i < 9; i++) {
+             printf("\t");
+            }
+    printf("   %c\n",186);
+
+    printf("%c\t\t\t-- Requisitar livro --\t\t\t   %c\n",186,186);
+    printf("%c",186);
+    for (uint8_t i = 1; i < 9; i++) {
+             printf("\t");
+            }
+    printf("   %c",186);
+    printf("\n%c",200);
+        for (uint8_t i = 1; i < 67; i++) {
+             printf("%c",205);
+            }
+    printf("%c\n",188);
+    //################################
+
+    char menu;
+    //Opção que permite um leitor já registado requisitar um livro disponível. Nesta opção, além das identificações do livro e do leitor, deverá ser solicitada a data de requisição.
+
+    printf("\tInserir Codigo do Leitor:");
+    //percorrer o array de leitores e verificar se o codigo existe
+    char codigo_leitor_compare[100];
+    fgets(codigo_leitor_compare, sizeof(codigo_leitor_compare), stdin);
+    for(int i=0;i<leitor_count;i++){
+        if(strcmp(codigo_leitor_compare,leitor[i].codigo_leitor)==0){
+            printf("\tIntroduzir codigo existente%!\n");
+            //mostrar codigos existentes
+            for(int i=0;i<leitor_count;i++){
+                    printf("Codigos disponiveis:\n")
+                    printf("\tCodigo: %s\n",leitor[i].codigo_leitor);
+            }
+            if(leitor_count==0){
+                printf("\tNao existem codigos disponiveis!\n");
+                printf("\tA voltar ao menu principal...")
+                sleep(1);
+                menu = 0;
+                return menu;
+            }
+            break;
+        }
+        else{
+            printf("\tDeseja Registar novo Leitor%? [Y/N]\n");
+            char sim_nao2 = S_or_N();
+
+            if (sim_nao2 == 'S'){
+                menu = 1;
+                return menu;
+            }
+            else if (sim_nao2 == 'N'){
+                menu = 0;
+                return menu;
+            }
+            break;
+        }
+    }
+
     printf("\tIntroduzir codigo existente%! [Y/N]\n");
     printf("\tDeseja Registar novo Leitor%? [Y/N]\n");
     printf("\tNome: **\n");
@@ -443,15 +505,39 @@ char Devolver_Livro(){
 }
 
 char Listagens(void){
-//menu para apresentar as listagens
-    char menu;
-    system("cls");
-    printf("\n\t\t\t-- Listagens --\n\n");
 
-    printf("\t1 - Listagem de Livros\n");
-    printf("\t2 - Listagem de Leitores\n");
-    printf("\t3 - Listagem de Requisicoes\n");
-    printf("\t4 - Listagem de ultimas Requisicoes\n\n");
+    //############## UI ##############
+    system("cls");
+    printf("%c", 201);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n", 187);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c\n", 186);
+    printf("%c\t\t\t-- Listagens --\t\t\t\t   %c\n", 186, 186);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++){
+        printf("\t");
+    }
+    printf("   %c", 186);
+    printf("\n%c", 200);
+    for (uint8_t i = 1; i < 67; i++){
+        printf("%c", 205);
+    }
+    printf("%c\n",188);
+    //################################
+
+    //menu para apresentar as listas
+
+    char menu;
+    printf("\t1 - Lista de Livros\n");
+    printf("\t2 - Lista de Leitores\n");
+    printf("\t3 - Lista de Requisicoes\n");
+    printf("\t4 - Lista de ultimas Requisicoes\n\n");
     printf("\tOpcao: ");
 
     menu = keyboard_Read();
@@ -481,16 +567,28 @@ void Listagem_livros(Livro_t livro[]){
     printf("\n%c", 200);
     for (uint8_t i = 1; i < 67; i++){
         printf("%c", 205);
+
     }
-    printf("%c\n\n", 188);
-    printf("\t1: ");
-    printf("\n\n\n\n\t2: ");
+    printf("%c\n",188);
     //################################
 
+    //apresentar todos dos livros existentes na estrutura de dados
+    for(uint8_t i=0;i<livro_count;i++){
+        printf("ISBN: %s\n",livro[i].ISBN);
+        printf("Titulo: %s\n",livro[i].titulo);
+        printf("Autor: %s\n",livro[i].autor);
+        printf("Editora: %s\n",livro[i].editora);
+        printf("Estado: %s\n",livro[i].estado);
+        printf("-----------------------------\n");
+    }
+    if (livro_count == 0){
+        printf("\n\tNao existem livros registados!\n\n");
+    }
+
+    printf("\n\n\tPressione qualquer tecla para voltar ao menu das listagens...");
+
     char menu;
-
-
-    menu = keyboard_Read();
+    scanf("%c",&menu);
 
     return menu;
 }
@@ -519,11 +617,27 @@ void Listagem_leitores(Leitor_t leitor[]){
         printf("%c", 205);
     }
     printf("%c\n\n", 188);
-    printf("\t1: ");
-    printf("\n\n\n\n\t2: ");
     //################################
 
+    //apresentar todos dos leitores existentes na estrutura de dados
+    for(uint8_t i=0;i<leitor_count;i++){
+        printf("Numero de leitor: %s\n",leitor[i].codigo_leitor);
+        printf("Nome: %s\n",leitor[i].nome);
+        printf("Data de nascimento: %s\n",leitor[i].data_nascimento);
+        printf("Morada: %s\n",leitor[i].localidade);
+        printf("Telefone: %s\n",leitor[i].contato_telefonico);
+        printf("-----------------------------\n");
+    }
+    if (leitor_count == 0){
+        printf("Nao existem leitores registados!\n");
+    }
+
+    printf("\n\n\tPressione qualquer tecla para voltar ao menu das listagens...");
+
     char menu;
+    scanf("%c",&menu);
+
+    return menu;
 
 }
 
@@ -586,6 +700,9 @@ void Listagem_ultimas_requisicoes(Leitor_t leitor[]){
     printf("\n\n\n\n\t2: ");
     //################################
 
+    //lista de ultimas requisicoes
+
+
     char menu;
 }
 
@@ -617,6 +734,9 @@ void Listagem_requisicoes(Leitor_t leitor[]){
     printf("\n\n\n\n\t2: ");
     //################################
 
+    //lista de livros que estao requisitados
+
+
     char menu;
 
 }
@@ -627,10 +747,10 @@ char keyboard_Read(){
 
     fflush(stdin);
     do{
-        gotoxy(23,16);
-        printf("\33[2K\r");
+        //gotoxy(23,16);
+        //printf("\33[2K\r");
         //data_dec = _getch();
-        printf("\t\tOP%c%cO: ",128,199);
+        //printf("\t\tOP%c%cO: ",128,199);
         fgets(data_dec, sizeof(data_dec), stdin);
         //gets(data_dec);
     }while (!(isdigit(data_dec[0]) || toupper(data_dec[0]) == 'S') || data_dec[1] != '\n');
