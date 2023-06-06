@@ -65,30 +65,42 @@ uint8_t Total_Livros;
 uint8_t Total_Leitores;
 uint8_t Total_Requisicoes;
 
-int livro_count=0;
-int leitor_count=0;
+int livro_count = 0;
+int leitor_count = 0;
+int requisicao_count = 0;
 
-//ESTRUTURAS DE DADOS
-typedef struct {
+// ESTRUTURAS DE DADOS
+typedef struct
+{
     char ISBN[14];
     char titulo[100];
     char autor[100];
     char editora[100];
-    char estado[1]; //D-disponivel, R-requisitado, I-inutilizado
+    char estado[10]; // D-disponivel, R-requisitado, I-inutilizado
 } Livro_t;
-
-typedef struct {
+typedef struct
+{
     char codigo_leitor[20];
     char nome[50];
-    char data_nascimento[11];
+    char data_nascimento[20];
     char localidade[50];
     char contato_telefonico[9];
 } Leitor_t;
 
+typedef struct
+{
+    char codigo_leitor[20];
+    char ISBN[14];
+    char data_requisicao[20];
+    char data_devolucao[20];
+    char estado_livro[10]; // D-disponivel, R-requisitado, I-inutilizado
+} Requisicao_t;
+
+// FUNCOES
 char Menu_Pincipal(void);
 char Registar_Livro(Livro_t livro[]);
 char Registar_Leitor(Leitor_t leitor[]);
-char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[]);
+char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[]);
 char Devolver_Livro(void);
 char Listagens(void);
 void Listagem_livros(Livro_t livro[]);
@@ -98,66 +110,82 @@ void Listagem_ultimas_requisicoes(Leitor_t leitor[]);
 char keyboard_Read();
 char S_or_N(void);
 
-void main(){
+void load_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes);
+void save_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes);
+
+void main()
+{
 
     char menu1, menu2;
 
     Livro_t livro[MAX_NUM_LIVROS];
     Leitor_t leitor[MAX_NUM_LEITORES];
+    Requisicao_t requisicao[MAX_NUM_LEITORES];
 
-    //Copies the character 0 to the first n characters of the string pointed to, by the argument str.
-    memset(&livro, 0, sizeof(livro));   //Coloca todos os bytes da estrutura a 0
-    memset(&leitor, 0, sizeof(leitor)); //Coloca todos os bytes da estrutura a 0
+    // Copies the character 0 to the first n characters of the string pointed to, by the argument str.
+    memset(&livro, 0, sizeof(livro));   // Coloca todos os bytes da estrutura a 0
+    memset(&leitor, 0, sizeof(leitor)); // Coloca todos os bytes da estrutura a 0
 
-    load_data(&livro,&leitor);//load the data from the file
+    load_data(&livro, &leitor, &requisicao); // load the data from the file
 
-    //Check the struck and count the number of books and readers
-    for (int i = 0; i < MAX_NUM_LIVROS; i++){
-        if (livro[i].ISBN[0] != 0){
+    // Check the struck and count the number of books and readers
+    for (int i = 0; i < MAX_NUM_LIVROS; i++)
+    {
+        if (livro[i].ISBN[0] != 0)
+        {
             livro_count++;
         }
     }
 
-    for (int i = 0; i < MAX_NUM_LEITORES; i++){
-        if (leitor[i].codigo_leitor[0] != 0){
+    for (int i = 0; i < MAX_NUM_LEITORES; i++)
+    {
+        if (leitor[i].codigo_leitor[0] != 0)
+        {
             leitor_count++;
         }
     }
 
-    do{
+    do
+    {
         menu1 = Menu_Pincipal();
-        switch (menu1){
+        switch (menu1)
+        {
         case '1':
-            do{
+            do
+            {
                 menu2 = Registar_Livro(livro);
 
-            }while (menu2 != 0 && menu2 != '0');
+            } while (menu2 != 0 && menu2 != '0');
             break;
         case '2':
-            do{
+            do
+            {
                 menu2 = Registar_Leitor(leitor);
 
             } while (menu2 != 0 && menu2 != '0');
             break;
         case '3':
-            do{
-                menu2 = Requisitar_Livro(leitor, livro);
+            do
+            {
+                menu2 = Requisitar_Livro(leitor, livro, requisicao);
 
             } while (menu2 != 0 && menu2 != '0');
             break;
         case '4':
-            do{
+            do
+            {
                 menu2 = Devolver_Livro();
-
 
             } while (menu2 != 0 && menu2 != '0');
             break;
 
         case '5':
-            do{
+            do
+            {
                 menu2 = Listagens();
 
-                switch (menu2){
+                switch (menu2)
+                {
                 case '1':
                     Listagem_livros(livro);
                     break;
@@ -180,51 +208,57 @@ void main(){
             // menu1 = Confirm_Exit();
             break;
         }
-    } while (menu1 != 'S' && menu1 != 's' );
+    } while (menu1 != 'S' && menu1 != 's');
 
     system("cls");
 
-    save_data(&livro,&leitor);
+    save_data(&livro, &leitor, &requisicao);
 
-
-    printf("\n\n\n\t\t-----FIM-----\n\n\n");
+    printf("\n\n\n\t\t-----FIM-----\n\n\n\n\n");
 }
 
-char Menu_Pincipal(){
+char Menu_Pincipal()
+{
     char menu;
 
     // ############## UI ##############
     system("cls");
     system("color 70");
     printf("%c", 201); // canto superior esquerdo
-    for (uint8_t i = 1; i < 92; i++){
+    for (uint8_t i = 1; i < 92; i++)
+    {
         printf("%c", 205); // linha horizontal
     }
     printf("%c", 187);   // canto superior direito
     printf("\n%c", 186); // linha vertical
-    for (uint8_t i = 1; i < 12; i++){
+    for (uint8_t i = 1; i < 12; i++)
+    {
         printf("\t");
     }
     printf("    %c", 186); // linha vertical
     printf("\n%c\t\t\t-- Gest%co de Requisi%c%ces de uma Biblioteca --\t\t\t    %c", 186, 198, 135, 228, 186);
     printf("\n%c", 186); // linha vertical
-    for (uint8_t i = 1; i < 12; i++){
+    for (uint8_t i = 1; i < 12; i++)
+    {
         printf("\t");
     }
     printf("    %c\n", 186); // linha vertical
-    printf("%c\tTotal de Livros:%d \t\t\tTotal de Leitores:%d \t\t\t    %c\n", 186, livro_count, leitor_count, 186);
-    printf("%c\tTotal de Requisi%c%ces ativas:%d\t", 186, 135, 228, Total_Requisicoes);
-    for (uint8_t i = 1; i < 7; i++){
+    printf("%c\tTotal de Livros: %d \t\t\tTotal de Leitores: %d \t\t\t    %c\n", 186, livro_count, leitor_count, 186);
+    printf("%c\tTotal de Requisi%c%ces ativas: %d\t", 186, 135, 228, Total_Requisicoes);
+    for (uint8_t i = 1; i < 7; i++)
+    {
         printf("\t");
     }
     printf("    %c\n", 186); // linha vertical
     printf("%c", 186);       // linha vertical
-    for (uint8_t i = 1; i < 12; i++){
+    for (uint8_t i = 1; i < 12; i++)
+    {
         printf("\t");
     }
     printf("    %c", 186); // linha vertical
     printf("\n%c", 200);   // canto inferior esquerdo
-    for (uint8_t i = 1; i < 92; i++){
+    for (uint8_t i = 1; i < 92; i++)
+    {
         printf("%c", 205); // linha horizontal
     }
     printf("%c", 188); // canto inferior direito
@@ -242,63 +276,75 @@ char Menu_Pincipal(){
     return menu;
 }
 
-char Registar_Livro(Livro_t livro[]){
+char Registar_Livro(Livro_t livro[])
+{
 
-    //############## UI ##############
+    // ############## UI ##############
     system("cls");
-    printf("%c",201);
-    for (uint8_t i = 1; i < 66; i++) {
-             printf("%c",205);
-            }
-    printf("%c\n",187);
-    printf("%c",186);
-    for (uint8_t i = 1; i < 9; i++) {
-             printf("\t");
-            }
-    printf("  %c\n",186);
+    printf("%c", 201);
+    for (uint8_t i = 1; i < 66; i++)
+    {
+        printf("%c", 205);
+    }
+    printf("%c\n", 187);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++)
+    {
+        printf("\t");
+    }
+    printf("  %c\n", 186);
 
-    printf("%c\t\t\t-- Registar Livro --\t\t\t  %c\n",186,186);
-    printf("%c",186);
-    for (uint8_t i = 1; i < 9; i++) {
-             printf("\t");
-            }
-    printf("  %c",186);
-    printf("\n%c",200);
-        for (uint8_t i = 1; i < 66; i++) {
-             printf("%c",205);
-            }
-    printf("%c",188);
-    //################################
+    printf("%c\t\t\t-- Registar Livro --\t\t\t  %c\n", 186, 186);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++)
+    {
+        printf("\t");
+    }
+    printf("  %c", 186);
+    printf("\n%c", 200);
+    for (uint8_t i = 1; i < 66; i++)
+    {
+        printf("%c", 205);
+    }
+    printf("%c", 188);
+    // ################################
 
     char menu;
     livro_count++;
 
-    printf("\n\n\t%c ISBN: ",175);
+    printf("\n\n\t%c ISBN: ", 175);
+    fflush(stdin);
     fgets(livro[livro_count].ISBN, sizeof(livro->ISBN), stdin);
 
-    printf("\t%c Titulo do Livro: ",175);
+    printf("\t%c Titulo do Livro: ", 175);
+    fflush(stdin);
     fgets(livro[livro_count].titulo, sizeof(livro->titulo), stdin);
 
-    printf("\t%c Autor do Livro: ",175);
+    printf("\t%c Autor do Livro: ", 175);
+    fflush(stdin);
     fgets(livro[livro_count].autor, sizeof(livro->autor), stdin);
 
-    printf("\t%c Editora do Livro: ",175);
+    printf("\t%c Editora do Livro: ", 175);
+    fflush(stdin);
     fgets(livro[livro_count].editora, sizeof(livro->editora), stdin);
 
-    printf("\t%c Estado do Livro: DISPONIVEL\n\n",175);
+    printf("\t%c Estado do Livro: DISPONIVEL\n\n", 175);
     livro[livro_count].estado[0] = 'D';
 
-    printf("\tDeseja confirmar registo%? [S/N]");
+    printf("\tDeseja confirmar registo ? [S/N]\n");
 
-    char sim_nao= S_or_N();
-    switch (sim_nao){
+    char sim_nao = S_or_N();
+
+    switch (sim_nao)
+    {
     case 'S':
         printf("\n\tLivro Registado com Sucesso!\n\n");
-        usleep(500000); //delay de 500ms
+        usleep(500000); // delay de 500ms
 
         break;
     case 'N':
-        for(int i=0;i<100;i++){
+        for (int i = 0; i < 100; i++)
+        {
             livro[livro_count].ISBN[i] = 0;
             livro[livro_count].titulo[i] = 0;
             livro[livro_count].autor[i] = 0;
@@ -306,190 +352,264 @@ char Registar_Livro(Livro_t livro[]){
             livro[livro_count].estado[i] = 0;
         }
         livro_count--;
-        printf("\n\tLivro N%co Registado!\n\n",198);
-        usleep(500000); //delay de 500ms
+        printf("\n\tLivro N%co Registado!\n\n", 198);
+        usleep(500000); // delay de 500ms
         break;
     }
 
-    printf("\tDeseja Continuar%? [S/N] ");
+    printf("\tDeseja Continuar? [S/N]\n");
 
     char sim_nao2 = S_or_N();
 
-    if(sim_nao2 == 'S'){
+    if (sim_nao2 == 'S')
+    {
         menu = 1;
         return menu;
     }
-    else if(sim_nao2 == 'N'){
+    else if (sim_nao2 == 'N')
+    {
         menu = 0;
         return menu;
     }
 }
 
-char Registar_Leitor(Leitor_t leitor[]){
+char Registar_Leitor(Leitor_t leitor[])
+{
 
-    //############## UI ##############
+    // ############## UI ##############
     system("cls");
-    printf("%c",201);
-    for (uint8_t i = 1; i < 67; i++) {
-             printf("%c",205);
-            }
-    printf("%c\n",187);
-    printf("%c",186);
-    for (uint8_t i = 1; i < 9; i++) {
-             printf("\t");
-            }
-    printf("   %c\n",186);
+    printf("%c", 201);
+    for (uint8_t i = 1; i < 67; i++)
+    {
+        printf("%c", 205);
+    }
+    printf("%c\n", 187);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++)
+    {
+        printf("\t");
+    }
+    printf("   %c\n", 186);
 
-    printf("%c\t\t\t-- Registar Leitor --\t\t\t   %c\n",186,186);
-    printf("%c",186);
-    for (uint8_t i = 1; i < 9; i++) {
-             printf("\t");
-            }
-    printf("   %c",186);
-    printf("\n%c",200);
-        for (uint8_t i = 1; i < 67; i++) {
-             printf("%c",205);
-            }
-    printf("%c",188);
-    //################################
+    printf("%c\t\t\t-- Registar Leitor --\t\t\t   %c\n", 186, 186);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++)
+    {
+        printf("\t");
+    }
+    printf("   %c", 186);
+    printf("\n%c", 200);
+    for (uint8_t i = 1; i < 67; i++)
+    {
+        printf("%c", 205);
+    }
+    printf("%c", 188);
+    // ################################
 
     char menu;
     leitor_count++;
 
-    printf("\n\n\t%c Codigo de Leitor: ",175);
+    printf("\n\n\t%c Codigo de Leitor: ", 175);
+    fflush(stdin);
     fgets(leitor[leitor_count].codigo_leitor, sizeof(leitor->codigo_leitor), stdin);
 
-    printf("\t%c Nome: ",175);
+    printf("\t%c Nome: ", 175);
+    fflush(stdin);
     fgets(leitor[leitor_count].nome, sizeof(leitor->nome), stdin);
 
-    printf("\t%c Data nascimento: ",175);
+    printf("\t%c Data nascimento: ", 175);
+    fflush(stdin);
     fgets(leitor[leitor_count].data_nascimento, sizeof(leitor->data_nascimento), stdin);
 
-    printf("\t%c Localidade: ",175);
+    printf("\t%c Localidade: ", 175);
+    fflush(stdin);
     fgets(leitor[leitor_count].localidade, sizeof(leitor->localidade), stdin);
 
-    printf("\t%c Numero de Telefone: ",175);
+    printf("\t%c Numero de Telefone: ", 175);
+    fflush(stdin);
     fgets(leitor[leitor_count].contato_telefonico, sizeof(leitor->contato_telefonico), stdin);
 
-    //printf("\t%c Email: **\n\n",175);
+    // printf("\t%c Email: **\n\n",175);
 
-    printf("\tDeseja confirmar registo%? [S/N]");
-    char sim_nao= S_or_N();
-    switch (sim_nao){
+    printf("\tDeseja confirmar registo%? [S/N]\n");
+    char sim_nao = S_or_N();
+    switch (sim_nao)
+    {
     case 'S':
         printf("\n\tLeitor Registado com Sucesso!\n\n");
-        usleep(500000); //delay de 500ms
+        usleep(500000); // delay de 500ms
 
         break;
     case 'N':
-        for(int i=0;i<100;i++){
+        for (int i = 0; i < 100; i++)
+        {
+            livro_count--;
             leitor[leitor_count].codigo_leitor[i] = 0;
             leitor[leitor_count].nome[i] = 0;
             leitor[leitor_count].data_nascimento[i] = 0;
             leitor[leitor_count].localidade[i] = 0;
-            leitor[leitor_count].contato_telefonico[i]= 0;
+            leitor[leitor_count].contato_telefonico[i] = 0;
         }
-        leitor_count--;
-        printf("\n\tLeitor N%co Registado!\n\n",198);
-        usleep(500000); //delay de 500ms
+        printf("\n\tLeitor N%co Registado!\n\n", 198);
+        usleep(500000); // delay de 500ms
         break;
     }
 
-    printf("\tDeseja Continuar%? [S/N] ");
+    printf("\tDeseja Continuar? [S/N]\n");
 
     char sim_nao2 = S_or_N();
 
-    if(sim_nao2 == 'S'){
+    if (sim_nao2 == 'S')
+    {
         menu = 1;
         return menu;
     }
-    else if(sim_nao2 == 'N'){
+    else if (sim_nao2 == 'N')
+    {
         menu = 0;
         return menu;
     }
 }
 
-char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[]){
+char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[])
+{
 
-    //############## UI ##############
+    // ############## UI ##############
     system("cls");
-    printf("%c",201);
-    for (uint8_t i = 1; i < 67; i++) {
-             printf("%c",205);
-            }
-    printf("%c\n",187);
-    printf("%c",186);
-    for (uint8_t i = 1; i < 9; i++) {
-             printf("\t");
-            }
-    printf("   %c\n",186);
+    printf("%c", 201);
+    for (uint8_t i = 1; i < 67; i++)
+    {
+        printf("%c", 205);
+    }
+    printf("%c\n", 187);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++)
+    {
+        printf("\t");
+    }
+    printf("   %c\n", 186);
 
-    printf("%c\t\t\t-- Requisitar livro --\t\t\t   %c\n",186,186);
-    printf("%c",186);
-    for (uint8_t i = 1; i < 9; i++) {
-             printf("\t");
-            }
-    printf("   %c",186);
-    printf("\n%c",200);
-        for (uint8_t i = 1; i < 67; i++) {
-             printf("%c",205);
-            }
-    printf("%c\n",188);
-    //################################
+    printf("%c\t\t\t-- Requisitar livro --\t\t\t   %c\n", 186, 186);
+    printf("%c", 186);
+    for (uint8_t i = 1; i < 9; i++)
+    {
+        printf("\t");
+    }
+    printf("   %c", 186);
+    printf("\n%c", 200);
+    for (uint8_t i = 1; i < 67; i++)
+    {
+        printf("%c", 205);
+    }
+    printf("%c\n", 188);
+    // ################################
 
     char menu;
-    //Opção que permite um leitor já registado requisitar um livro disponível. Nesta opção, além das identificações do livro e do leitor, deverá ser solicitada a data de requisição.
+    int flag = 0;
+    // Opção que permite um leitor já registado requisitar um livro disponível. Nesta opção, além das identificações do livro e do leitor, deverá ser solicitada a data de requisição.
+    printf("\t\nCodigos de leitor disponiveis:\n");
 
-    printf("\tInserir Codigo do Leitor:");
-    //percorrer o array de leitores e verificar se o codigo existe
+    for (int i = 1; i < leitor_count + 1; i++)
+    {
+        printf("\t\tCodigo: %s\n", leitor[i].codigo_leitor);
+    }
+
+    printf("\n\tInserir Codigo do Leitor:");
+    // percorrer o array de leitores e verificar se o codigo existe
     char codigo_leitor_compare[100];
+    fflush(stdin);
     fgets(codigo_leitor_compare, sizeof(codigo_leitor_compare), stdin);
 
-    for(int i=0;i<leitor_count;i++){
-        if(strcmp(codigo_leitor_compare,leitor[i].codigo_leitor)==0){
-            printf("\tIntroduzir codigo existente%!\n");
-            //mostrar codigos existentes
-            for(int i=0;i<leitor_count;i++){
-                    printf("Codigos disponiveis:\n");
-                    printf("\tCodigo: %s\n",leitor[i].codigo_leitor);
-            }
+    for (int i = 1; i < leitor_count + 1; i++)
+    {
+        if (strcmp(codigo_leitor_compare, leitor[i].codigo_leitor) == 0)
+        {
+            fflush(stdin);
+            fgets(requisicao[requisicao_count].codigo_leitor, sizeof(requisicao->codigo_leitor), stdin);
+            printf("\tCodigo de Leitor Encontrado!\n\n");
+            flag = 1;
+            break;
         }
     }
 
-    if (leitor_count == 0){
-        printf("\tNao existem codigos disponiveis!\n");
+    if (flag == 0 || leitor_count == 0)
+    {
+        printf("\tCodigo de Leitor N%co Encontrado!\n", 198);
         printf("\tA voltar ao menu principal...");
         sleep(1);
         menu = 0;
         return menu;
     }
-        else{
+
+    flag = 0;
+    printf("\t\nCodigos de livro disponiveis:\n");
+
+    for (int i = 1; i < livro_count + 1; i++)
+    {
+        printf("\t\tCodigo: %s\n", livro[i].ISBN);
+    }
+    printf("\n\tInserir Codigo do Livro:");
+    char codigo_livro_compare[100];
+    fflush(stdin);
+    fgets(codigo_livro_compare, sizeof(codigo_livro_compare), stdin);
+
+    for (int i = 1; i < livro_count + 1; i++)
+    {
+        if (strcmp(codigo_livro_compare, livro[i].ISBN) == 0)
+        {
+            fflush(stdin);
+            fgets(requisicao[requisicao_count].ISBN, sizeof(requisicao->ISBN), stdin);
+            
+            printf("\tCodigo de Livro Encontrado!\n\n");
+            flag = 1;
+            break;
+        }
+    }
+
+    if (flag == 0 || livro_count == 0)
+    {
+        printf("\tCodigo de Livro N%co Encontrado!\n", 198);
+        printf("\tA voltar ao menu principal...");
+        sleep(1);
+        menu = 0;
+        return menu;
+    }
+    //data de requisição
+    printf("\tData da requisicao: **\n\n");
+    fflush(stdin);
+
+
+    /*
+        else
+        {
             printf("\tDeseja Registar novo Leitor%? [Y/N]\n");
             char sim_nao2 = S_or_N();
 
-            if (sim_nao2 == 'S'){
+            if (sim_nao2 == 'S')
+            {
                 menu = 1;
                 return menu;
             }
-            else if (sim_nao2 == 'N'){
+            else if (sim_nao2 == 'N')
+            {
                 menu = 0;
                 return menu;
             }
         }
-
-
-    printf("\tIntroduzir codigo existente%! [Y/N]\n");
-    printf("\tDeseja Registar novo Leitor%? [Y/N]\n");
+    */
+    printf("\tIntroduzir codigo existente ! [Y/N]\n");
+    printf("\tDeseja Registar novo Leitor ? [Y/N]\n");
     printf("\tNome: **\n");
-    printf("\tData da requisicao: **\n\n");
-    printf("\tDeseja confirmar requisicao%? [Y/N]\n");
-    printf("\tDeseja Continuar%? [Y/N] ");
+    //printf("\tData da requisicao: **\n\n");
+    printf("\tDeseja confirmar requisicao ? [Y/N]\n");
+    printf("\tDeseja Continuar ? [Y/N] ");
 
     menu = keyboard_Read();
     return menu;
 }
 
-char Devolver_Livro(){
+char Devolver_Livro()
+{
     char menu;
     system("cls");
     printf("\n\t\t\t-- Devolver Livro_t --\n\n");
@@ -498,41 +618,46 @@ char Devolver_Livro(){
     printf("\tData da entrega: **\n");
     printf("\tDias de utilizacao: **\n");
     printf("\tEstado do Livro: [1-inutilizavel/2-utilizavel]\n\n");
-    printf("\tDeseja confirmar devolucao%? [S/N]\n");
-    printf("\tDeseja Continuar%? [S/N] ");
+    printf("\tDeseja confirmar devolucao ? [S/N]\n");
+    printf("\tDeseja Continuar ? [S/N]\n");
 
     menu = keyboard_Read();
     return menu;
 }
 
-char Listagens(void){
+char Listagens(void)
+{
 
-    //############## UI ##############
+    // ############## UI ##############
     system("cls");
     printf("%c", 201);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
     printf("%c\n", 187);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c\n", 186);
     printf("%c\t\t\t-- Listagens --\t\t\t\t   %c\n", 186, 186);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c", 186);
     printf("\n%c", 200);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
-    printf("%c\n",188);
-    //################################
+    printf("%c\n", 188);
+    // ################################
 
-    //menu para apresentar as listas
+    // menu para apresentar as listas
 
     char menu;
     printf("\t1 - Lista de Livros\n");
@@ -546,234 +671,275 @@ char Listagens(void){
     return menu;
 }
 
-void Listagem_livros(Livro_t livro[]){
+void Listagem_livros(Livro_t livro[])
+{
 
-    //############## UI ##############
+    // ############## UI ##############
     system("cls");
     printf("%c", 201);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
     printf("%c\n", 187);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c\n", 186);
     printf("%c\t\t\t-- Lista de Livros --\t\t\t   %c\n", 186, 186);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c", 186);
     printf("\n%c", 200);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
-
     }
-    printf("%c\n",188);
-    //################################
+    printf("%c\n", 188);
+    // ################################
 
-    //apresentar todos dos livros existentes na estrutura de dados
-    for(uint8_t i=0;i<livro_count;i++){
-        printf("ISBN: %s\n",livro[i].ISBN);
-        printf("Titulo: %s\n",livro[i].titulo);
-        printf("Autor: %s\n",livro[i].autor);
-        printf("Editora: %s\n",livro[i].editora);
-        printf("Estado: %s\n",livro[i].estado);
+    // apresentar todos dos livros existentes na estrutura de dados
+    for (uint8_t i = 1; i < livro_count + 1; i++)
+    {
+        printf("ISBN: %s\n", livro[i].ISBN);
+        printf("Titulo: %s\n", livro[i].titulo);
+        printf("Autor: %s\n", livro[i].autor);
+        printf("Editora: %s\n", livro[i].editora);
+        // se dentro do livro[i].estado == D, entao o livro esta disponivel
+        // se dentro do livro[i].estado == R, entao o livro esta requisitado
+        // se dentro do livro[i].estado == I, entao o livro esta inutilizavel
+
+        char estado = livro[i].estado;
+        switch (estado)
+        {
+        case 'D':
+            printf("Estado: Disponivel\n");
+            break;
+        case 'R':
+            printf("Estado: Requisitado\n");
+            break;
+        case 'I':
+            printf("Estado: Inutilizavel\n");
+            break;
+        default:
+            printf("Estado: Desconhecido\n");
+            break;
+        }
         printf("-----------------------------\n");
     }
-    if (livro_count == 0){
+    if (livro_count == 0)
+    {
         printf("\n\tNao existem livros registados!\n\n");
     }
 
     printf("\n\n\tPressione qualquer tecla para voltar ao menu das listagens...");
 
-    char menu;
-    scanf("%c",&menu);
-
-    return menu;
+    _getch();
 }
 
-void Listagem_leitores(Leitor_t leitor[]){
-    //############## UI ##############
+void Listagem_leitores(Leitor_t leitor[])
+{
+    // ############## UI ##############
     system("cls");
     printf("%c", 201);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
     printf("%c\n", 187);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c\n", 186);
     printf("%c\t\t\t-- Lista de Leitores --\t\t\t   %c\n", 186, 186);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c", 186);
     printf("\n%c", 200);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
     printf("%c\n\n", 188);
-    //################################
+    // ################################
 
-    //apresentar todos dos leitores existentes na estrutura de dados
-    for(uint8_t i=0;i<leitor_count;i++){
-        printf("Numero de leitor: %s\n",leitor[i].codigo_leitor);
-        printf("Nome: %s\n",leitor[i].nome);
-        printf("Data de nascimento: %s\n",leitor[i].data_nascimento);
-        printf("Morada: %s\n",leitor[i].localidade);
-        printf("Telefone: %s\n",leitor[i].contato_telefonico);
+    // apresentar todos dos leitores existentes na estrutura de dados
+    for (uint8_t i = 1; i < leitor_count + 1; i++)
+    {
+        printf("Numero de leitor: %s\n", leitor[i].codigo_leitor);
+        printf("Nome: %s\n", leitor[i].nome);
+        printf("Data de nascimento: %s\n", leitor[i].data_nascimento);
+        printf("Morada: %s\n", leitor[i].localidade);
+        printf("Telefone: %s\n", leitor[i].contato_telefonico);
         printf("-----------------------------\n");
     }
-    if (leitor_count == 0){
+    if (leitor_count == 0)
+    {
         printf("\n\tNao existem leitores registados!\n");
     }
 
     printf("\n\n\tPressione qualquer tecla para voltar ao menu das listagens...");
-
-    char menu;
-    scanf("%c",&menu);
-
-    return menu;
-
+    _getch();
 }
 
-void Listagem_livros_requisitados(Livro_t livro[]){
-    //############## UI ##############
+void Listagem_livros_requisitados(Livro_t livro[])
+{
+    // ############## UI ##############
     system("cls");
     printf("%c", 201);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
     printf("%c\n", 187);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c\n", 186);
     printf("%c\t\t\t-- Lista de Livros Requisitados --\t\t   %c\n", 186, 186);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c", 186);
     printf("\n%c", 200);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
     printf("%c\n\n", 188);
     printf("\t1: ");
     printf("\n\n\n\n\t2: ");
-    //################################
+    // ################################
 
     char menu;
 }
 
-void Listagem_ultimas_requisicoes(Leitor_t leitor[]){
-    //############## UI ##############
+void Listagem_ultimas_requisicoes(Leitor_t leitor[])
+{
+    // ############## UI ##############
     system("cls");
     printf("%c", 201);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
     printf("%c\n", 187);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c\n", 186);
     printf("%c\t\t\t-- Lista de Ultimas Requisicoes --\t\t   %c\n", 186, 186);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c", 186);
     printf("\n%c", 200);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
     printf("%c\n\n", 188);
     printf("\t1: ");
     printf("\n\n\n\n\t2: ");
-    //################################
+    // ################################
 
-    //lista de ultimas requisicoes
-
+    // lista de ultimas requisicoes
 
     char menu;
 }
 
-void Listagem_requisicoes(Leitor_t leitor[]){
-    //############## UI ##############
+void Listagem_requisicoes(Leitor_t leitor[])
+{
+    // ############## UI ##############
     system("cls");
     printf("%c", 201);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
     printf("%c\n", 187);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c\n", 186);
     printf("%c\t\t\t-- Lista de Requisicoes --\t\t\t   %c\n", 186, 186);
     printf("%c", 186);
-    for (uint8_t i = 1; i < 9; i++){
+    for (uint8_t i = 1; i < 9; i++)
+    {
         printf("\t");
     }
     printf("   %c", 186);
     printf("\n%c", 200);
-    for (uint8_t i = 1; i < 67; i++){
+    for (uint8_t i = 1; i < 67; i++)
+    {
         printf("%c", 205);
     }
     printf("%c\n\n", 188);
     printf("\t1: ");
     printf("\n\n\n\n\t2: ");
-    //################################
+    // ################################
 
-    //lista de livros que estao requisitados
-
+    // lista de livros que estao requisitados
 
     char menu;
-
 }
 
-char keyboard_Read(){
-
+char keyboard_Read()
+{
     char data_dec[10];
 
-    fflush(stdin);
-    do{
-        //gotoxy(23,16);
-        //printf("\33[2K\r");
-        //data_dec = _getch();
-        //printf("\t\tOP%c%cO: ",128,199);
+    do
+    {
+        // gotoxy(23,16);
+        // printf("\33[2K\r");
+        // data_dec = _getch();
+        // printf("\t\tOP%c%cO: ",128,199);
+        fflush(stdin);
         fgets(data_dec, sizeof(data_dec), stdin);
-        //gets(data_dec);
-    }while (!(isdigit(data_dec[0]) || toupper(data_dec[0]) == 'S') || data_dec[1] != '\n');
+        // gets(data_dec);
+    } while (!(isdigit(data_dec[0]) || toupper(data_dec[0]) == 'S') || data_dec[1] != '\n');
 
     return toupper(data_dec[0]);
 }
 
-char keyboard_Read_str(){
+char keyboard_Read_str()
+{
     char data_srt;
 
     fflush(stdin);
-    do{
+    do
+    {
         data_srt = _getch();
-    }while(!(isalpha(data_srt)));
+    } while (!(isalpha(data_srt)));
     return data_srt;
 }
 
-void load_data(Livro_t *livros, Leitor_t *leitores) {
-    //ler ficheiro binario e se nao existir criar um novo
+void load_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes)
+{
+    // ler ficheiro binario e se nao existir criar um novo
     FILE *fileptr = fopen("data.dat", "rb");
-    if (fileptr == NULL) {
+    if (fileptr == NULL)
+    {
         fileptr = fopen("data.dat", "wb");
         printf("Erro a abrir o ficheiro!\n");
         fclose(fileptr);
@@ -781,35 +947,44 @@ void load_data(Livro_t *livros, Leitor_t *leitores) {
     }
     fread(livros, sizeof(Livro_t), MAX_NUM_LIVROS, fileptr);
     fread(leitores, sizeof(Leitor_t), MAX_NUM_LEITORES, fileptr);
+    fread(requisicoes, sizeof(Requisicao_t), MAX_NUM_LEITORES, fileptr);
     fclose(fileptr);
 }
 
-void save_data(Livro_t *livros, Leitor_t *leitores) {
-    //guardar ficheiro binario
+void save_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes)
+{
+    // guardar ficheiro binario
     FILE *fileptr = fopen("data.dat", "wb");
-    if (fileptr == NULL) {
+    if (fileptr == NULL)
+    {
         printf("Erro a guardar o ficheiro!\n");
         return;
     }
     fwrite(livros, sizeof(Livro_t), MAX_NUM_LIVROS, fileptr);
     fwrite(leitores, sizeof(Leitor_t), MAX_NUM_LEITORES, fileptr);
+    fwrite(requisicoes, sizeof(Requisicao_t), MAX_NUM_LEITORES, fileptr);
     fclose(fileptr);
     printf("\n\tDados guardados com sucesso!\n");
 }
 
-void gotoxy(int x, int y){
-  COORD coord;
-  coord.X = x;
-  coord.Y = y;
-  SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+void gotoxy(int x, int y)
+{
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-char S_or_N(void){
-    //recebe S ou N e retorna S ou N
+char S_or_N(void)
+{
+    // recebe S ou N e retorna S ou N
     char c[10];
-    do{
+    do
+    {
+        printf("\tResposta:");
+        fflush(stdin);
         fgets(c, sizeof(c), stdin);
-    }while(!(toupper(c[0]) == 'S' || toupper(c[0]) == 'N') || c[1] != '\n');
+    } while (!(toupper(c[0]) == 'S' || toupper(c[0]) == 'N') || c[1] != '\n');
 
     return toupper(c[0]);
 }
