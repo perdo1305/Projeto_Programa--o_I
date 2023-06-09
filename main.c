@@ -70,31 +70,34 @@ unsigned int requisicao_count = 0;
 // ESTRUTURAS DE DADOS
 typedef struct
 {
-    char ISBN[14];
+    char ISBN[20];
     char titulo[100];
     char autor[100];
     char editora[100];
     char estado[10]; // D-disponivel, R-requisitado, I-inutilizado
 } Livro_t;
 typedef struct
+
 {
     char codigo_leitor[20];
     char nome[50];
     char data_nascimento[20];
     char localidade[50];
-    char contato_telefonico[10];
+    char contato_telefonico[20];
 } Leitor_t;
 
 typedef struct
 {
     char codigo_leitor[20];
-    char ISBN[14];
-    char data_requisicao_dia[3];
-    char data_requisicao_mes[3];
-    char data_requisicao_ano[5];
+    char ISBN[20];
+    // char data_requisicao[20];
+    char data_requisicao_dia[5];
+    char data_requisicao_mes[5];
+    char data_requisicao_ano[6];
     char data_devolucao[20];
     char estado_livro[10]; // D-disponivel, R-requisitado, I-inutilizado
     char index_livro[10];
+    char index_leitor[10];
 
 } Requisicao_t;
 
@@ -108,7 +111,7 @@ char Listagens(void);
 void Listagem_livros(Livro_t livro[]);
 void Listagem_leitores(Leitor_t leitor[]);
 void Listagem_livros_requisitados(Livro_t livro[], Requisicao_t requisicao[]);
-void Listagem_ultimas_requisicoes(Leitor_t leitor[]);
+void Listagem_ultimas_requisicoes(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[]);
 char keyboard_Read();
 char S_or_N(void);
 void formatar_data(char *data);
@@ -152,7 +155,7 @@ int main()
     // Check the struck and count the number of readers
     for (int i = 0; i < MAX_NUM_LEITORES; i++)
     {
-        if (leitor[i].codigo_leitor[0] != 0)
+        if (leitor[i].codigo_leitor[0] != 0 && leitor[i].contato_telefonico[0] != 0)
         {
             leitor_count++;
         }
@@ -160,7 +163,7 @@ int main()
     // Check the struck and count the number of requisitions
     for (int i = 0; i < MAX_NUM_LEITORES; i++)
     {
-        if (requisicao[i].ISBN[0] != 0)
+        if (requisicao[i].ISBN[0] != 0 && requisicao[i].ISBN[0] != '0')
         {
             requisicao_count++;
         }
@@ -217,7 +220,7 @@ int main()
                     Listagem_livros_requisitados(livro, requisicao);
                     break;
                 case '4':
-                    Listagem_ultimas_requisicoes(leitor);
+                    Listagem_ultimas_requisicoes(leitor, livro, requisicao);
                     break;
                 }
 
@@ -291,10 +294,12 @@ char Menu_Pincipal()
     printf("\t%c 4-Devolver Livro\n", 175);
     printf("\t%c 5-Listagens\n", 175);
     printf("\t%c S-Sair\n\n", 175);
-    printf("\t\tOP%c%cO: ", 128, 199);
     // ################################
-
-    menu = keyboard_Read();
+    do
+    {
+        printf("\t\tOP%c%cO: ", 128, 199);
+        menu = keyboard_Read();
+    } while (menu != '1' && menu != '2' && menu != '3' && menu != '4' && menu != '5' && menu != 'S' && menu != 's');
     return menu;
 }
 
@@ -328,7 +333,7 @@ char Registar_Livro(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao[
     {
         printf("%c", 205);
     }
-    printf("%c", 188);
+    printf("%c\n", 188);
     // ################################
 
     char menu;
@@ -336,14 +341,19 @@ char Registar_Livro(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao[
     livro_count++;
     do
     {
-        printf("\n\n\t%c ISBN: ", 175);
+        printf("\n\t%c ISBN: ", 175);
         flag = 0;
         fflush(stdin);
         fgets(livro[livro_count].ISBN, sizeof(livro->ISBN), stdin);
-        if (strlen(livro[livro_count].ISBN) != 13)
+
+        // printf("\n %d", strlen(livro[livro_count].ISBN)); //debug
+
+        if ((strlen(livro[livro_count].ISBN)) != 14)
         {
             printf("ISBN deve ter 13 digitos!\n");
+            flag = 1;
         }
+
         for (int i = 0; i < 13; i++)
         {
             if (!isdigit(livro[livro_count].ISBN[i]))
@@ -353,7 +363,7 @@ char Registar_Livro(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao[
                 break;
             }
         }
-    } while (strlen(livro[livro_count].ISBN) != 13 && flag == 1);
+    } while (flag == 1);
 
     printf("\t%c Titulo do Livro: ", 175);
     fflush(stdin);
@@ -377,7 +387,7 @@ char Registar_Livro(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao[
     switch (sim_nao)
     {
     case 'S':
-        printf("\n\tLivro Registado com Sucesso!\n\n");
+        printf("\n\tLivro Registado com Sucesso!\n");
         save_data(livro, leitor, requisicao);
         sleep(1);
 
@@ -462,18 +472,20 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
 
     do
     {
+        barra_count = 0;
         flag = 0;
         // data nascimento deve ser inserida no formato dd/mm/aaaa
         // o programa le os digitos ate encontrar uma barra depois le mais 2 digitos e depois mais uma barra e depois mais 4 digitos
-        printf("\t%c Data nascimento: ", 175);
+        printf("\t%c Data nascimento dd/mm/aaaa", 175);
+        printf("\n\tReposta:");
         fflush(stdin);
         fgets(leitor[leitor_count].data_nascimento, sizeof(leitor->data_nascimento), stdin);
         if (strlen(leitor[leitor_count].data_nascimento) != 11)
         {
-            printf("Data de nascimento deve ser inserida no formato dd/mm/aaaa, tem caracteres a mais...\n");
+            printf("Data de nascimento deve ser inserida no formato dd/mm/aaaa\n");
             flag = 1;
         }
-        for (int i = 0; i < 11; i++)
+        for (int i = 0; i < 12; i++)
         {
             if (leitor[leitor_count].data_nascimento[i] == '/')
             {
@@ -482,7 +494,7 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
         }
         if (barra_count != 2)
         {
-            printf("Data de nascimento deve ser inserida no formato dd/mm/aaaa, faltam caracteres...\n");
+            printf("Data de nascimento deve ser inserida no formato dd/mm/aaaa\n");
             flag = 1;
         }
         sscanf(leitor[leitor_count].data_nascimento, "%d/%d/%d", &dia, &mes, &ano);
@@ -516,7 +528,10 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
         printf("\t%c Numero de Telefone: ", 175);
         fflush(stdin);
         fgets(leitor[leitor_count].contato_telefonico, sizeof(leitor->contato_telefonico), stdin);
-        if (strlen(leitor[leitor_count].contato_telefonico) != 9)
+
+        // printf("%d", strlen(leitor[leitor_count].contato_telefonico)); // debug
+
+        if (strlen(leitor[leitor_count].contato_telefonico) != 10)
         {
             printf("Numero de telefone deve ser inserido no formato 9xxxxxxxx\n");
             flag2 = 1;
@@ -536,17 +551,17 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
 
         break;
     case 'N':
-    
+
         for (int i = 0; i < 100; i++)
         {
-            leitor[leitor_count].codigo_leitor[i] = NULL;
-            leitor[leitor_count].nome[i] = NULL;
-            leitor[leitor_count].data_nascimento[i] = NULL;
-            leitor[leitor_count].localidade[i] = NULL;
-            leitor[leitor_count].contato_telefonico[i] = NULL;
+            leitor[leitor_count].codigo_leitor[i] = 0;
+            leitor[leitor_count].nome[i] = 0;
+            leitor[leitor_count].data_nascimento[i] = 0;
+            leitor[leitor_count].localidade[i] = 0;
+            leitor[leitor_count].contato_telefonico[i] = 0;
         }
         printf("\n\tLeitor N%co Registado!\n\n", 198);
-        livro_count--;
+        leitor_count--;
         sleep(1);
         break;
     }
@@ -619,11 +634,12 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
     fflush(stdin);
     fgets(codigo_leitor_compare, sizeof(codigo_leitor_compare), stdin);
 
-    for (uint8_t i = 1; i < leitor_count + 1; i++)
+    for (int i = 1; i < leitor_count + 1; i++)
     {
         if (strcmp(codigo_leitor_compare, leitor[i].codigo_leitor) == 0)
         {
             strcpy(requisicao[requisicao_count].codigo_leitor, leitor[i].codigo_leitor);
+            requisicao[requisicao_count].index_leitor[0] = i;
             printf("\tCodigo de Leitor Encontrado!\n\n");
             // requisicao[requisicao_count].index_livro[0]= i;
             flag = 1;
@@ -658,6 +674,7 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
         if (strcmp(codigo_livro_compare, livro[i].ISBN) == 0)
         {
             strcpy(requisicao[requisicao_count].ISBN, livro[i].ISBN);
+            requisicao[requisicao_count].index_livro[0] = i;
             printf("\tCodigo de Livro Encontrado!\n\n");
             flag = 1;
             break;
@@ -673,78 +690,161 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
         return menu;
     }
     // data de requisição deve ser introduzida pelo utilizador da seguinte forma: dd/mm/aaaa
-
-    printf("\tData da requisicao:\n");
-    printf("\tdia:");
-    // verificar se o dia so tem 2 dos numeros e se é inferior a 31
+    int dia_requisicao = 0, mes_requisicao = 0, ano_requisicao = 0;
+    int flag_dia = 0, flag_mes = 0, flag_ano = 0;
+    int flag_data = 0;
     do
     {
-        fflush(stdin);
-        fgets(requisicao[requisicao_count].data_requisicao_dia, sizeof(requisicao->data_requisicao_dia), stdin);
-        if (strlen(requisicao[requisicao_count].data_requisicao_dia) != 3)
+        printf("\t%c Data de Requisicao:", 175);
+        flag_data = 0;
+        do
         {
-            printf("\tDia invalido, insira novamente:");
-        }
-    } while (strlen(requisicao[requisicao_count].data_requisicao_dia) != 3);
 
-    fflush(stdin);
-    fgets(requisicao[requisicao_count].data_requisicao_dia, sizeof(requisicao->data_requisicao_dia), stdin);
+            printf("\n\tDia:");
+            fflush(stdin);
+            fgets(requisicao[requisicao_count].data_requisicao_dia, sizeof(requisicao[requisicao_count].data_requisicao_dia), stdin);
+            dia_requisicao = atoi(requisicao[requisicao_count].data_requisicao_dia);
+            if (dia_requisicao > 31 || dia_requisicao < 1)
+            {
+                printf("\tDia Invalido!\n");
+                flag_dia = 1;
+            }
+            else
+            {
+                flag_dia = 0;
+            }
 
-    printf("\tmes:");
-    fflush(stdin);
-    fgets(requisicao[requisicao_count].data_requisicao_mes, sizeof(requisicao->data_requisicao_mes), stdin);
+        } while (flag_dia == 1);
 
-    printf("\tano:");
-    fflush(stdin);
-    fgets(requisicao[requisicao_count].data_requisicao_ano, sizeof(requisicao->data_requisicao_ano), stdin);
+        do
+        {
 
-    // verificar data de hoje e verificar se a data inserida é superior a data de hoje, ter em conta os anos bissextos
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    int dia = tm.tm_mday;
-    int mes = tm.tm_mon + 1;
-    int ano = tm.tm_year + 1900;
+            printf("\tMes:");
+            fflush(stdin);
+            fgets(requisicao[requisicao_count].data_requisicao_mes, sizeof(requisicao[requisicao_count].data_requisicao_mes), stdin);
+            mes_requisicao = atoi(requisicao[requisicao_count].data_requisicao_mes);
+            if (mes_requisicao > 12 || mes_requisicao < 1)
+            {
+                printf("\tMes Invalido!\n");
+                flag_mes = 1;
+            }
+            else
+            {
+                flag_mes = 0;
+            }
+        } while (flag_mes == 1);
 
-    // converter string em int
-    int dia_requisicao = atoi(requisicao[requisicao_count].data_requisicao_dia);
-    int mes_requisicao = atoi(requisicao[requisicao_count].data_requisicao_mes);
-    int ano_requisicao = atoi(requisicao[requisicao_count].data_requisicao_ano);
+        do
+        {
 
-    // ########################################
-    //  verificar se a data inserida é superior a data de hoje
-    if (ano_requisicao > ano)
-    {
-        printf("\tData de requisicao superior a data de hoje!\n");
-        printf("\tA voltar ao menu principal...");
-        sleep(4);
-        menu = 0;
-        return menu;
-    }
-    else if (ano_requisicao == ano)
-    {
-        if (mes_requisicao > mes)
+            printf("\tAno:");
+            fflush(stdin);
+            fgets(requisicao[requisicao_count].data_requisicao_ano, sizeof(requisicao[requisicao_count].data_requisicao_ano), stdin);
+            ano_requisicao = atoi(requisicao[requisicao_count].data_requisicao_ano);
+            if (ano_requisicao > 2023 || ano_requisicao < 1900)
+            {
+                printf("\tAno Invalido!\n");
+                flag_ano = 1;
+            }
+            else
+            {
+                flag_ano = 0;
+            }
+        } while (flag_ano == 1);
+
+        // verificar data de hoje e verificar se a data inserida é superior a data de hoje, ter em conta os anos bissextos
+        time_t t = time(NULL);
+        struct tm tm = *localtime(&t);
+        int dia = tm.tm_mday;
+        int mes = tm.tm_mon + 1;
+        int ano = tm.tm_year + 1900;
+
+        //  verificar se a data inserida é superior a data de hoje
+        if (ano_requisicao > ano)
         {
             printf("\tData de requisicao superior a data de hoje!\n");
-            printf("\tA voltar ao menu principal...");
-            sleep(4);
-            menu = 0;
-            return menu;
+            flag_data = 1;
         }
-        else if (mes_requisicao == mes)
+        else if (ano_requisicao == ano)
         {
-            if (dia_requisicao > dia)
+            if (mes_requisicao > mes)
             {
                 printf("\tData de requisicao superior a data de hoje!\n");
-                printf("\tA voltar ao menu principal...");
-                sleep(4);
-                menu = 0;
-                return menu;
+                flag_data = 1;
+            }
+            else if (mes_requisicao == mes)
+            {
+                if (dia_requisicao > dia)
+                {
+                    printf("\tData de requisicao superior a data de hoje!\n");
+                    flag_data = 1;
+                }
             }
         }
-    }
+    } while (flag_data == 1);
+
+    printf("\tData de Requisicao: %d/%d/%d\n", atoi(requisicao[requisicao_count].data_requisicao_dia), atoi(requisicao[requisicao_count].data_requisicao_mes), atoi(requisicao[requisicao_count].data_requisicao_ano));
     // acrescentar 15 dias a data de requisição para obter a data de devolução, ter em atencao á mudanca de mes e de anos bisextos
+    int dia_devolucao = 0, mes_devolucao = 0, ano_devolucao = 0;
+    int dias_para_devolucao = 15;
+
+    dia_devolucao = atoi(requisicao[requisicao_count].data_requisicao_dia);
+    mes_devolucao = atoi(requisicao[requisicao_count].data_requisicao_mes);
+    ano_devolucao = atoi(requisicao[requisicao_count].data_requisicao_ano);
+
+    // verificar se o dia de devolução é superior ao numero de dias do mes
+
+    if (mes_devolucao == 1 || mes_devolucao == 3 || mes_devolucao == 5 || mes_devolucao == 7 || mes_devolucao == 8 || mes_devolucao == 10 || mes_devolucao == 12)
+    {
+        if (dia_devolucao + dias_para_devolucao > 31)
+        {
+            dia_devolucao = (dia_devolucao + dias_para_devolucao) - 31;
+            if (mes_devolucao == 12)
+            {
+                mes_devolucao = 1;
+                ano_devolucao = ano_devolucao + 1;
+            }
+            else
+            {
+                mes_devolucao = mes_devolucao + 1;
+            }
+        }
+        else
+        {
+            dia_devolucao = dia_devolucao + dias_para_devolucao;
+        }
+    }
+    else if (mes_devolucao == 4 || mes_devolucao == 6 || mes_devolucao == 9 || mes_devolucao == 11)
+    {
+        if (dia_devolucao + dias_para_devolucao > 30)
+        {
+            dia_devolucao = (dia_devolucao + dias_para_devolucao) - 30;
+            mes_devolucao = mes_devolucao + 1;
+        }
+        else
+        {
+            dia_devolucao = dia_devolucao + dias_para_devolucao;
+        }
+    }
+    else if (mes_devolucao == 2)
+    {
+        if (dia_devolucao + dias_para_devolucao > 28)
+        {
+            dia_devolucao = (dia_devolucao + dias_para_devolucao) - 28;
+            mes_devolucao = mes_devolucao + 1;
+        }
+        else
+        {
+            dia_devolucao = dia_devolucao + dias_para_devolucao;
+        }
+    }
+    printf("\tData de Devolucao: %d/%d/%d\n", dia_devolucao, mes_devolucao, ano_devolucao);
+    char data_devolucao[20];
+    sprintf(data_devolucao, "%d/%d/%d", dia_devolucao, mes_devolucao, ano_devolucao);
+    strcpy(requisicao[requisicao_count].data_devolucao, data_devolucao);
 
     // estado do livro
+
     strcpy(requisicao[requisicao_count].estado_livro, "R");
 
     // confirmar requisicao
@@ -754,11 +854,12 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
     switch (sim_nao)
     {
     case 'S':
+
         printf("\tRequisicao confirmada!\n");
+        save_data(livro, leitor, requisicao);
         sleep(1);
         break;
     case 'N':
-        requisicao_count--;
         for (int i = 0; i < 100; i++)
         {
 
@@ -771,6 +872,7 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
             requisicao[requisicao_count].estado_livro[i] = 0;
         }
         printf("\tRequisicao cancelada!\n");
+        requisicao_count--;
         sleep(1);
         break;
     }
@@ -842,72 +944,127 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
     printf("%c\n", 188);
     // ################################
 
-    printf("\t\nCodigos de livro disponiveis:\n");
-
-    for (int i = 1; i < livro_count + 1; i++)
-    {
-        printf("\t\tCodigo: %s\n", requisicao[i].ISBN);
-    }
-    printf("\n\tInserir Codigo do Livro:");
-    char codigo_livro_compare[100];
-    fflush(stdin);
-    fgets(codigo_livro_compare, sizeof(codigo_livro_compare), stdin);
-
     int flag = 0;
-
-    for (int i = 1; i < requisicao_count + 1; i++)
+    int indice_requisicao;
+    do
     {
-        if (strcmp(codigo_livro_compare, requisicao[i].ISBN) == 0)
+        indice_requisicao = 0;
+        printf("\t\nCodigos de livros requisitados disponiveis:\n");
+
+        for (int i = 1; i < requisicao_count + 1; i++)
         {
-            strcpy(requisicao[requisicao_count].ISBN, livro[i].ISBN);
-            printf("\tCodigo de Livro Encontrado!\n\n");
-            flag = 1;
-            break;
+            printf("\t\tCodigo: %s\n", requisicao[i].ISBN);
         }
-    }
+        printf("\n\tInserir Codigo do Livro:");
+        char codigo_livro_compare[100];
+        fflush(stdin);
+        fgets(codigo_livro_compare, sizeof(codigo_livro_compare), stdin);
 
-    if (flag == 0 || requisicao_count == 0)
-    {
-        printf("\tCodigo de Livro N%co Encontrado!\n", 198);
-        printf("\tA voltar ao menu principal...");
-        sleep(4);
-        char menu = 0;
-        return menu;
-    }
-    /*
-    // print da estrutura requisicao
-    printf("\tISBN: %s\n", requisicao[requisicao_count].ISBN);
-    printf("\tData da entrega: %s\n", requisicao[requisicao_count].data_requisicao);
-    printf("\tDias de devolucao: %s\n", requisicao[requisicao_count].data_devolucao);
-    // calcular dias de utilizacao e dar print
-    int dia, mes, ano;
-    sscanf(requisicao[requisicao_count].data_requisicao, "%d/%d/%d", &dia, &mes, &ano);
+        flag = 0;
+
+        for (int i = 1; i < requisicao_count + 1; i++)
+        {
+            if (strcmp(codigo_livro_compare, requisicao[i].ISBN) == 0)
+            {
+
+                indice_requisicao = i;
+                printf("\tCodigo de Livro Encontrado!\n\n");
+                // print da estrutura requisicao
+                printf("\t\tCodigo de Leitor: %s", requisicao[i].codigo_leitor);
+                printf("\t\tISBN: %s", requisicao[i].ISBN);
+                printf("\t\tData de requisicao: %d/%d/%d\n", atoi(requisicao[i].data_requisicao_dia), atoi(requisicao[i].data_requisicao_mes), atoi(requisicao[i].data_requisicao_ano));
+                printf("\t\tData de devolucao: %s\n", requisicao[i].data_devolucao);
+
+                flag = 1;
+                break;
+            }
+        }
+
+        if (flag == 0 || requisicao_count == 0)
+        {
+            printf("\tCodigo de Livro N%co Encontrado!\n", 198);
+        }
+    } while (flag == 0 || requisicao_count == 0);
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    int dia1 = tm.tm_mday;
+    int mes1 = tm.tm_mon + 1;
+    int ano1 = tm.tm_year + 1900;
+    printf("\tData de hoje: %d/%d/%d\n", dia1, mes1, ano1);
+
+    // sscanf(requisicao[requisicao_count].data_requisicao, "%d/%d/%d", &dia, &mes, &ano);
+    // sscanf(requisicao[indice_requisicao].data_requisicao_dia, "%d", &dia1);
+    // sscanf(requisicao[indice_requisicao].data_requisicao_mes, "%d", &mes1);
+    // sscanf(requisicao[indice_requisicao].data_requisicao_ano, "%d", &ano1);
     int dia2, mes2, ano2;
-    sscanf(requisicao[requisicao_count].data_devolucao, "%d/%d/%d", &dia2, &mes2, &ano2);
-    int dias = (dia2 - dia) + (mes2 - mes) * 30 + (ano2 - ano) * 365;
-    printf("\tDias de utilizacao: %d\n", dias);
-    // calcular dias de atraso e dar print
-    int dias_atraso = dias - 15;
+    sscanf(requisicao[indice_requisicao].data_devolucao, "%d/%d/%d", &dia2, &mes2, &ano2);
+    int dias1 = (dia1 - dia2) + ((mes1 - mes2) * 30) + ((ano1 - ano2) * 365);
+    // printf("\tDias de utilizacao: %d\n", dias1);
+    //  calcular dias de atraso e dar print
+    int dias_atraso = dias1 - 15;
     if (dias_atraso < 0)
     {
         dias_atraso = 0;
     }
-    printf("\tDias de atraso: %d\n", dias_atraso);
-    */
+    printf("\t\tDias de atraso: %d\n\n", dias_atraso);
+    printf("\t\tDois euros por dia de atraso\n");
+    printf("\t\tValor a pagar: %d$\n\n ", dias_atraso * 2); // 2 euros por dia de atraso
     // perguntar o estado do livro e alterar na estrutura livro e na estrutura requisicao
     printf("\tEstado do Livro: [1-inutilizavel/2-utilizavel]\n");
-    // fflush(stdin);
-    // int index =
-    //
-    // fgets(livro[livro_count].estado_livro, sizeof(livro[livro_count].estado_livro), stdin);
-    // fgets(requisicao[requisicao_count].estado_livro, sizeof(requisicao[requisicao_count].estado_livro), stdin);
+    fflush(stdin);
+    // faz scanf e recebe apenas ou 1 ou 2
+    int estado_livro;
+    int estado_flag1, estado_flag2;
+    do
+    {
+        estado_flag1 = 0;
+        estado_flag2 = 0;
+        printf("\tResposta: ");
+        scanf("%d", &estado_livro);
+
+        if (estado_livro == 1) // inutilizavel
+        {
+            estado_flag1 = 1;
+        }
+        else if (estado_livro == 2) // utilizavel/disponivel
+        {
+            estado_flag2 = 1;
+        }
+        else
+        {
+            printf("\t\tEstado invalido!\n");
+        }
+    } while (estado_livro != 1 && estado_livro != 2);
 
     // confirmar devolucao
     printf("\tDeseja confirmar devolucao ? [S/N]\n");
     char sim_nao = S_or_N();
     if (sim_nao == 'S')
     {
+        if (estado_flag1 == 1)
+        {
+            int var = atoi(requisicao[indice_requisicao].index_livro);
+            strcpy(livro[var].estado, "I");
+            strcpy(requisicao[indice_requisicao].estado_livro, "I");
+        }
+        else if (estado_flag2 == 1)
+        {
+            int var = atoi(requisicao[indice_requisicao].index_livro);
+            strcpy(livro[var].estado, "D");
+            strcpy(requisicao[indice_requisicao].estado_livro, "D");
+        }
+        // coloca a 0 os dados da estrutura requisicao
+        strcpy(requisicao[indice_requisicao].codigo_leitor, "0");
+        strcpy(requisicao[indice_requisicao].ISBN, "0");
+        strcpy(requisicao[indice_requisicao].data_requisicao_dia, "0");
+        strcpy(requisicao[indice_requisicao].data_requisicao_mes, "0");
+        strcpy(requisicao[indice_requisicao].data_requisicao_ano, "0");
+        strcpy(requisicao[indice_requisicao].data_devolucao, "0");
+        strcpy(requisicao[indice_requisicao].estado_livro, "0");
+        requisicao_count--;
         printf("\tDevolucao confirmada!\n");
+        save_data(livro, leitor, requisicao);
     }
     else if (sim_nao == 'N')
     {
@@ -963,16 +1120,18 @@ char Listagens(void)
     // ################################
 
     // menu para apresentar as listas
-
     char menu;
-    printf("\t1 - Lista de Livros\n");
-    printf("\t2 - Lista de Leitores\n");
-    printf("\t3 - Lista de Requisicoes\n");
-    printf("\t4 - Lista de ultimas Requisicoes\n\n");
-    printf("\t0 - Voltar ao menu principal\n\n");
-    printf("\tOpcao: ");
+    printf("\n\n\t%c 1-Lista de Livros\n", 175);
+    printf("\t%c 2-Lista de Leitores\n", 175);
+    printf("\t%c 3-Lista de Requisicoes\n", 175);
+    printf("\t%c 4-Lista de ultimas Requisicoes\n", 175);
+    printf("\t%c 0-Voltar ao menu principal\n\n", 175);
 
-    menu = keyboard_Read();
+    do
+    {
+        printf("\t\tOP%c%cO: ", 128, 199);
+        menu = keyboard_Read();
+    } while (menu != '1' && menu != '2' && menu != '3' && menu != '4' && menu != '0');
     return menu;
 }
 
@@ -1005,7 +1164,7 @@ void Listagem_livros(Livro_t livro[])
     {
         printf("%c", 205);
     }
-    printf("%c\n", 188);
+    printf("%c\n\n", 188);
     // ################################
 
     // apresentar todos dos livros existentes na estrutura de dados
@@ -1133,16 +1292,11 @@ void Listagem_livros_requisitados(Livro_t livro[], Requisicao_t requisicao[])
 
     // apresenta todos os livros requisitados na estrutura de dados
 
-    for (uint8_t i = 1; i < requisicao_count + 1; i++)
+    for (int i = 1; i < requisicao_count + 1; i++)
     {
         printf("Numero de leitor: %s\n", requisicao[i].codigo_leitor);
         printf("ISBN: %s\n", requisicao[i].ISBN);
-
-        // juntar requisicao[i].data_requisicao_dia, requisicao[i].data_requisicao_mes, requisicao[i].data_requisicao_ano numa string
-        char data_requisicao[11];
-        sprintf(data_requisicao, "%u/%u/%u", atoi(requisicao[i].data_requisicao_dia), atoi(requisicao[i].data_requisicao_mes), atoi(requisicao[i].data_requisicao_ano));
-
-        printf("Data de requisicao: %s\n", data_requisicao);
+        printf("Data de requisicao: %d/%d/%d\n\n", atoi(requisicao[i].data_requisicao_dia), atoi(requisicao[i].data_requisicao_mes), atoi(requisicao[i].data_requisicao_ano));
         printf("Data de devolucao: %s\n", requisicao[i].data_devolucao);
         printf("-----------------------------\n");
     }
@@ -1154,7 +1308,7 @@ void Listagem_livros_requisitados(Livro_t livro[], Requisicao_t requisicao[])
     _getch();
 }
 
-void Listagem_ultimas_requisicoes(Leitor_t leitor[])
+void Listagem_ultimas_requisicoes(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[])
 {
     // ############## UI ##############
     system("cls");
@@ -1187,9 +1341,16 @@ void Listagem_ultimas_requisicoes(Leitor_t leitor[])
     printf("\n\n\n\n\t2: ");
     // ################################
 
-    // lista de ultimas requisicoes
+    // lista de ultimas requisicoes por leitor
+    for (int i = 1; i < requisicao_count; i++)
+    {
+        printf("Numero de leitor: %s\n", requisicao[i].codigo_leitor);
+        for (int j = 1; j < livro_count; j++)
+        {
+            // ########################ESTou aqui################################
+        }
+    } 
 }
-
 char keyboard_Read()
 {
     char data_dec[10];
@@ -1238,7 +1399,7 @@ void save_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes)
     fwrite(leitores, sizeof(Leitor_t), MAX_NUM_LEITORES, fileptr);
     fwrite(requisicoes, sizeof(Requisicao_t), MAX_NUM_LEITORES, fileptr);
     fclose(fileptr);
-    printf("\n\tDados guardados com sucesso!\n");
+    printf("\n\tDados guardados com sucesso!\n\n");
 }
 
 void gotoxy(int x, int y)

@@ -2,7 +2,7 @@
 1684251065 source:c:\users\pedro\onedrive - ipleiria\desktop\projeto_programação_i\main.c
 	<stdio.h>
 
-1686151976 source:c:\users\pedro\onedrive - ipleiria\desktop\polytechnic\1_ano_eec\2_semestre\programação i\projeto_programação_i\main.c
+1686267963 source:c:\users\pedro\onedrive - ipleiria\desktop\polytechnic\1_ano_eec\2_semestre\programação i\projeto_programação_i\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -11,4 +11,5 @@
 	<conio.h>
 	<unistd.h>
 	<time.h>
+	<ctype.h>
 
