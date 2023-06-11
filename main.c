@@ -50,13 +50,13 @@ carregados para o programa.
 ▪ Se achar pertinente poderá acrescentar outros campos nas estruturas criadas.
 */
 
-/*----------------------------------------------------------------------------------------------------------------------------
-Engenharia eletrotecnica e de computadores
+/*___________________________________________________________________________________________________________________________
+ENGENARIA ELECTROTECNICA E DE COMPUTADORES
 PROJETO DE PROGRAMACAO 1
 Pedro Ferreira-2222035
 Bernardo Santos-2222033
 */
-//----------------------------------------------------------------------------------------------------------------------------
+//___________________________________________________________________________________________________________________________
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,26 +106,24 @@ typedef struct
     char estado_livro[10]; // D-disponivel, R-requisitado, I-inutilizado
     char index_livro[10];
     char index_leitor[10];
-
 } Requisicao_t;
 
 // PROTOTIPOS DE FUNCOES
 
-char Menu_Pincipal(void); // apresenta o menu principal
-char Registar_Livro(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao[]);
-char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao[]);
-char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[]);
-char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[]);
-char Listagens(void);
-void Listagem_livros(Livro_t livro[]);
-void Listagem_leitores(Leitor_t leitor[]);
-void Listagem_livros_requisitados(Livro_t livro[], Requisicao_t requisicao[]);
-void Listagem_ultimas_requisicoes(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[]);
-char keyboard_Read(); // leitura de teclado, retorna os caracteres introduzidos se forem 0-5 e S,s
-char S_or_N(void);    // leitura de teclado, retorna S,s ou N,n
-
-void load_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes); // carrega os dados apartir do ficheiro binario
-void save_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes); // guarda os dados no ficheiro binario
+char Menu_Pincipal(void);                                                                         // apresenta o menu principal
+char Registar_Livro(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao[]);               // funcao para o utilizador registar um livro
+char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao[]);              // funcao para o utilizador registar um leitor
+char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[]);             // funcao para o utilizador requisitar um livro
+char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[]);               // funcao para o utilizador devolver um livro
+char Listagens(void);                                                                             // funcao para o utilizador escolher a listagem que pretende
+void Listagem_livros(Livro_t livro[]);                                                            // funcao para o utilizador listar todos os livros
+void Listagem_leitores(Leitor_t leitor[]);                                                        // funcao para o utilizador listar todos os leitores
+void Listagem_livros_requisitados(Livro_t livro[], Requisicao_t requisicao[]);                    // funcao para o utilizador listar todos os livros requisitados
+void Listagem_ultimas_requisicoes(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[]); // funcao para o utilizador listar as 10 ultimas requisicoes de um leitor
+char keyboard_Read();                                                                             // leitura de teclado, retorna os caracteres introduzidos se forem 0-5 e S,s
+char S_or_N(void);                                                                                // leitura de teclado, retorna S,s ou N,n
+void load_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes);                   // carrega os dados apartir do ficheiro binario
+void save_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes);                   // guarda os dados no ficheiro binario
 
 int main()
 {
@@ -137,8 +135,7 @@ int main()
     {
         printf("%c", 36);
     }
-    printf("%c\n", 36);
-    printf("%c", 36);
+    printf("%c\n%c", 36, 36);
     for (int i = 1; i < 9; i++)
     {
         printf("\t");
@@ -147,29 +144,27 @@ int main()
 
     printf("%c\t\t\t Projeto de Programacao \t\t   %c\n", 36, 36);
     printf("%c\t\t\t   de Computadores 1  \t\t\t   %c\n", 36, 36);
-    printf("%c\t\t\t       2022/2023  \t\t\t   %c\n", 36, 36);
-    printf("%c", 36);
+    printf("%c\t\t\t       2022/2023  \t\t\t   %c\n%c", 36, 36, 36);
     for (int i = 1; i < 9; i++)
     {
         printf("\t");
     }
-    printf("   %c\n", 36);
-    printf("%c", 36);
+    printf("   %c\n%c", 36, 36);
     for (int i = 1; i < 9; i++)
     {
         printf("\t");
     }
-    printf("   %c\n", 36);
-    printf("%c", 36);
+    printf("   %c\n%c", 36, 36);
+
     for (int i = 1; i < 9; i++)
     {
         printf("\t");
     }
+
     printf("   %c\n", 36);
     printf("%c\t Bernardo\t\t\t\t    Pedro \t   %c\n", 36, 36);
     printf("%c\t Santos\t\t\t\t\t    Ferreira\t   %c\n", 36, 36);
-    printf("%c\t 2222033\t\t\t\t    2222035\t   %c", 36, 36);
-    printf("\n%c", 36);
+    printf("%c\t 2222033\t\t\t\t    2222035\t   %c\n%c", 36, 36, 36);
     for (int i = 1; i < 9; i++)
     {
         printf("\t");
@@ -181,10 +176,10 @@ int main()
     }
     printf("%c\n\n", 36);
 
-    // ###############################################################################################################
-
-    sleep(4);
+    sleep(3);
     system("cls");
+
+    // ###############################################################################################################
 
     char menu1, menu2;
 
@@ -226,7 +221,7 @@ int main()
 
     do
     {
-        menu1 = Menu_Pincipal();
+        menu1 = Menu_Pincipal(); // mostra o menu principal e retorna a opcao escolhida pelo utilizador
         switch (menu1)
         {
         case '1': // se o utilizador escolher a opcao 1
@@ -261,46 +256,46 @@ int main()
         case '5': // se o utilizador escolher a opcao 5
             do
             {
-                menu2 = Listagens();
+                menu2 = Listagens(); // mostra o menu das listagens e retorna a opcao escolhida pelo utilizador
 
                 switch (menu2)
                 {
-                case '1':
+                case '1': // se o utilizador escolher a opcao 1
                     Listagem_livros(livro);
                     break;
-                case '2':
+                case '2': // se o utilizador escolher a opcao 2
                     Listagem_leitores(leitor);
                     break;
-                case '3':
+                case '3': // se o utilizador escolher a opcao 3
                     Listagem_livros_requisitados(livro, requisicao);
                     break;
-                case '4':
+                case '4': // se o utilizador escolher a opcao 4
                     Listagem_ultimas_requisicoes(leitor, livro, requisicao);
                     break;
                 }
 
-            } while (menu2 != 0 && menu2 != '0');
+            } while (menu2 != 0 && menu2 != '0'); // sai do menu das listagens se o utilizador escolher a opcao 0
             break;
 
         case '0': // se o utilizador escolher a opcao 0
             system("cls");
             break;
         }
-    } while (menu1 != 'S' && menu1 != 's'); // se o utilizador escolher a opcao S ou s
+    } while (menu1 != 'S' && menu1 != 's'); // o programa acaba se o utilizador escolher a opcao S ou s no menu principal
 
-    system("cls");
+    system("cls"); // apaaga o terminal
 
     save_data(livro, leitor, requisicao); // save the data to the file
 
-    printf("\n\n\n\t\t-----FIM-----\n\n\n\n\n");
-    return 0;
+    printf("\n\n\n\t\t-----FIM-----\n\n\n\n\n"); // mensagem de fim de programa
+
+    return 0; // nao era necessario mas o compilador nao gosta de funcoes do tipo void
 }
 
 char Menu_Pincipal()
 {
-    char menu;
 
-    // ############## UI ##############
+    // ############## UI ##############################
     system("cls");
     system("color 70");
     printf("%c", 201); // canto superior esquerdo
@@ -348,7 +343,10 @@ char Menu_Pincipal()
     printf("\t%c 4-Devolver Livro\n", 175);
     printf("\t%c 5-Listagens\n", 175);
     printf("\t%c S-Sair\n\n", 175);
-    // ################################
+    // ##########################################################
+
+    char menu;
+
     do
     {
         printf("\t\tOP%c%cO: ", 128, 199); // imprime "OPCAO:" com acentos
@@ -635,17 +633,17 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
         break;
     }
 
-    printf("\tDeseja Continuar? [S/N]\n");
+    printf("\tDeseja Continuar? [S/N]\n");// pergunta se quer continuar a registar leitores
 
     char sim_nao2 = S_or_N();
 
     if (sim_nao2 == 'S')
-    {
+    {// se a resposta for sim, retorna 1 e volta a registar leitores
         menu = 1;
         return menu;
     }
     else if (sim_nao2 == 'N')
-    {
+    {// se a resposta for nao, retorna 0 e volta ao menu principal
         menu = 0;
         return menu;
     }
@@ -654,7 +652,6 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
 
 char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[])
 {
-
     // ############## UI ##############
     system("cls");
     printf("%c", 201);
@@ -724,7 +721,7 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
         }
     }
     //--------------------------------------------------------------------
-    // Se o codigo inserido nao for valido, retorna ao menu principal---------------
+    // Se o codigo inserido nao for valido, retorna ao menu principal-----
     if (flag == 0 || leitor_count == 0)
     {
         printf("\tCodigo de Leitor N%co Encontrado!\n", 198);
@@ -739,7 +736,7 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
 
     // imprime os codigos dos livros disponiveis
     printf("\t\nCodigos de livro disponiveis:\n");
-    // Percorrer o array de livros e imprimir os codigos---------------
+    // Percorrer o array de livros e imprimir os codigos------------------
     for (int i = 1; i < livro_count + 1; i++)
     {
         printf("\t\tCodigo: %s\n", livro[i].ISBN);
@@ -762,7 +759,7 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
             index_flag2 = i;
             // guardar o index do livro requisitado no historico de requisicoes do leitor
 
-            //leitor[index_flag].historico_requisicoes[0] = i;//coloquei mais a baixo no codigo
+            // leitor[index_flag].historico_requisicoes[0] = i;//coloquei mais a baixo no codigo
 
             printf("\tCodigo de Livro Encontrado!\n\n");
             flag = 1;
@@ -770,7 +767,7 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
         }
     }
     //--------------------------------------------------------------------
-    // Se o codigo inserido nao for valido, retorna ao menu principal---------------
+    // Se o codigo inserido nao for valido, retorna ao menu principal-----
     if (flag == 0 || livro_count == 0)
     {
         printf("\tCodigo de Livro N%co Encontrado!\n", 198);
@@ -786,11 +783,11 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
     int flag_dia = 0, flag_mes = 0, flag_ano = 0;                   // flags para verificar se a data inserida e valida
     int flag_data = 0;                                              // flag para verificar se a data inserida e valida
     do
-    { // ciclo para verificar se a data inserida e valida
+    { // ciclo para verificar se a data inserida e valida----------------
         printf("\t%c Data de Requisicao:", 175);
         flag_data = 0;
         do
-        { // ciclo para verificar se o dia inserido e valido
+        { // ciclo para verificar se o dia inserido e valido-------------
 
             printf("\n\tDia:");
             fflush(stdin);
@@ -809,7 +806,7 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
         } while (flag_dia == 1);
 
         do
-        { // ciclo para verificar se o mes inserido e valido
+        { // ciclo para verificar se o mes inserido e valido----------------
 
             printf("\tMes:");
             fflush(stdin);
@@ -827,7 +824,7 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
         } while (flag_mes == 1);
 
         do
-        { // ciclo para verificar se o ano inserido e valido
+        { // ciclo para verificar se o ano inserido e valido----------------
 
             printf("\tAno:");
             fflush(stdin);
@@ -891,8 +888,8 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
     // meses de 31 dias
     if (mes_devolucao == 1 || mes_devolucao == 3 || mes_devolucao == 5 || mes_devolucao == 7 || mes_devolucao == 8 || mes_devolucao == 10 || mes_devolucao == 12)
     {
-        if (dia_devolucao + dias_para_devolucao > 31) // se o dia de devolução for superior ao numero de dias do mes, a flag e ativada
-        {
+        if (dia_devolucao + dias_para_devolucao > 31) // se o dia de devolução for superior ao numero de dias do mes, o dia e acrescentado 15 e o mes e acrescentado 1
+        {//meses de 31 dias------------------------------------------------------
             dia_devolucao = (dia_devolucao + dias_para_devolucao) - 31;
             if (mes_devolucao == 12) // se o mes for 12, o mes passa a ser 1 e o ano e acrescentado 1
             {
@@ -908,10 +905,10 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
         {
             dia_devolucao = dia_devolucao + dias_para_devolucao;
         }
-    } // meses de 30 dias
+    } // meses de 30 dias------------------------------------------------------
     else if (mes_devolucao == 4 || mes_devolucao == 6 || mes_devolucao == 9 || mes_devolucao == 11)
     {
-        if (dia_devolucao + dias_para_devolucao > 30) // se o dia de devolução for superior ao numero de dias do mes, a flag e ativada
+        if (dia_devolucao + dias_para_devolucao > 30) // se o dia de devolução for superior ao numero de dias do mes, o dia e acrescentado 15 e o mes e acrescentado 1
         {
             dia_devolucao = (dia_devolucao + dias_para_devolucao) - 30;
             mes_devolucao = mes_devolucao + 1;
@@ -920,10 +917,10 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
         {
             dia_devolucao = dia_devolucao + dias_para_devolucao;
         }
-    } // mes de fevereiro
+    } // mes de fevereiro------------------------------------------------------
     else if (mes_devolucao == 2)
     {
-        if (dia_devolucao + dias_para_devolucao > 28) // se o dia de devolução for superior ao numero de dias do mes, a flag e ativada
+        if (dia_devolucao + dias_para_devolucao > 28) //se o dia de devolução for superior ao numero de dias do mes, o dia e acrescentado 15 e o mes e acrescentado 1
         {
             dia_devolucao = (dia_devolucao + dias_para_devolucao) - 28;
             mes_devolucao = mes_devolucao + 1;
@@ -955,13 +952,12 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
         // guardar dados no ficheiro
         if (flag_historico == 1)
         {
-            
+
             for (int i = 9; i > 0; i--)
             {
                 // copiar o historico de requisições para o historico de requisições anterior
                 // desloca para a direita
                 leitor[index_flag].historico_requisicoes[i] = leitor[index_flag].historico_requisicoes[i - 1];
-
             }
             leitor[index_flag].historico_requisicoes[0] = index_flag2;
         }
@@ -1116,9 +1112,10 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
 
     int dia2, mes2, ano2;                                                                  // variaveis para guardar a data de devolucao
     sscanf(requisicao[indice_requisicao].data_devolucao, "%d/%d/%d", &dia2, &mes2, &ano2); // guarda a data de devolucao na variavel dia2, mes2 e ano2
+    //printf("%s\n", requisicao[indice_requisicao].data_devolucao);
     int dias1 = (dia1 - dia2) + ((mes1 - mes2) * 30) + ((ano1 - ano2) * 365);              // calcula os dias de utilizacao
     // printf("\tDias de utilizacao: %d\n", dias1);
-    //  calcular dias de atraso e dar print
+    //  calcular dias de atraso e dar print------------------------------------------
     int dias_atraso = dias1 - 15; // calcula os dias de atraso
     if (dias_atraso < 0)
     {
@@ -1127,13 +1124,13 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
 
     printf("\t\tDias de atraso: %d\n\n", dias_atraso);
     printf("\t\tDois euros por dia de atraso\n");
-    printf("\t\tValor a pagar: %d$\n\n ", dias_atraso * 2); // 2 euros por dia de atraso
+    printf("\t\tValor a pagar: %d€\n\n ", dias_atraso * 2); // 2 euros por dia de atraso
     // perguntar o estado do livro e alterar na estrutura livro e na estrutura requisicao
     printf("\tEstado do Livro: [1-inutilizavel/2-utilizavel]\n");
     fflush(stdin);
-    // faz scanf e recebe apenas ou 1 ou 2
-    int estado_livro;
-    int estado_flag1, estado_flag2;
+    // faz scanf e recebe apenas ou 1 ou 2-----------------------------------------
+    int estado_livro;               // variavel para o scanf (1 ou 2)
+    int estado_flag1, estado_flag2; // flags para verificar se o estado do livro e 1 ou 2
     do
     {
         estado_flag1 = 0;
@@ -1162,18 +1159,21 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
     {
         if (estado_flag1 == 1)
         {
+            // LIVRO INUTILIZAVEL_______________________________________
             int var = atoi(requisicao[indice_requisicao].index_livro);
-            printf("%d",var);
-            strcpy(livro[var+1].estado, "I");
+            printf("%d", var);
+            strcpy(livro[var + 1].estado, "I");
             strcpy(requisicao[indice_requisicao].estado_livro, "I");
         }
         else if (estado_flag2 == 1)
         {
+            // LIVRO DISPONIVEL____________________________________________
             int var = atoi(requisicao[indice_requisicao].index_livro);
-            strcpy(livro[var+1].estado, "D");
+            strcpy(livro[var + 1].estado, "D");
             strcpy(requisicao[indice_requisicao].estado_livro, "D");
         }
-        // coloca a 0 os dados da estrutura requisicao
+        // coloca a 0 os dados da estrutura requisicao para retirar o livro da lista de requisicoes
+
         strcpy(requisicao[indice_requisicao].codigo_leitor, "0");
         strcpy(requisicao[indice_requisicao].ISBN, "0");
         strcpy(requisicao[indice_requisicao].data_requisicao_dia, "0");
@@ -1181,24 +1181,27 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
         strcpy(requisicao[indice_requisicao].data_requisicao_ano, "0");
         strcpy(requisicao[indice_requisicao].data_devolucao, "0");
         strcpy(requisicao[indice_requisicao].estado_livro, "0");
+
         requisicao_count--;
+
         printf("\tDevolucao confirmada!\n");
         save_data(livro, leitor, requisicao);
     }
     else if (sim_nao == 'N')
     {
+        // se nao confirmar devolucao, basicamente nao faz nada
         printf("\tDevolucao cancelada!\n");
     }
 
-    // voltar ao menu principal
+    // voltar ao menu principal?
     printf("\tDeseja Continuar ? [S/N]\n");
-    char sim_nao2 = S_or_N();
+    char sim_nao2 = S_or_N(); // funcao para receber apenas S ou N
     if (sim_nao2 == 'S')
     {
-        char menu = 0;
+        char menu = 1; // retorna 1 e volta para a funcao devolver livro
         return menu;
     }
-    else if (sim_nao2 == 'N')
+    else if (sim_nao2 == 'N') // retorna 0 e volta para o menu principal
     {
         char menu = 0;
         return menu;
@@ -1247,10 +1250,12 @@ char Listagens(void)
     printf("\t%c 0-Voltar ao menu principal\n\n", 175);
 
     do
-    {
+    { // restringe a escolha do utilizador a 1,2,3,4 ou 0
         printf("\t\tOP%c%cO: ", 128, 199);
         menu = keyboard_Read();
     } while (menu != '1' && menu != '2' && menu != '3' && menu != '4' && menu != '0');
+    // se for 0 volta para o menu principal se for 1,2,3 ou 4 vai para a funcao respetiva
+
     return menu;
 }
 
@@ -1298,34 +1303,34 @@ void Listagem_livros(Livro_t livro[])
         // se dentro do livro[i].estado == I, entao o livro esta inutilizavel
 
         char estado = livro[i].estado[0];
-        switch (estado)
+        switch (estado) // da display ao estado correto do livro
         {
-        case 'D':
+        case 'D': // recebe d e escreve disponivel
         case 'd':
             printf("Estado: Disponivel\n");
             break;
-        case 'R':
+        case 'R': // recebe r e escreve requisitado
         case 'r':
             printf("Estado: Requisitado\n");
             break;
-        case 'I':
+        case 'I': // recebe i e escreve inutilizavel
         case 'i':
             printf("Estado: Inutilizavel\n");
             break;
-        default:
+        default: // caso haja um erro, da display de desconhecido
             printf("Estado: Desconhecido\n");
             break;
         }
         printf("-----------------------------\n");
     }
-    if (livro_count == 0)
+    if (livro_count == 0) // se nao existirem livros registados da display de nao existirem livros
     {
         printf("\n\tNao existem livros registados!\n\n");
     }
 
     printf("\n\n\tPressione qualquer tecla para voltar ao menu das listagens...");
 
-    _getch();
+    _getch(); // é so para esperar que o utilizador carregue numa tecla para voltar ao menu das listagens
 }
 
 void Listagem_leitores(Leitor_t leitor[])
@@ -1369,13 +1374,13 @@ void Listagem_leitores(Leitor_t leitor[])
         printf("Telefone: %s\n", leitor[i].contato_telefonico);
         printf("-----------------------------\n");
     }
-    if (leitor_count == 0)
+    if (leitor_count == 0) // se nao existirem leitores registados da display de nao existirem leitores
     {
         printf("\n\tNao existem leitores registados!\n");
     }
 
     printf("\n\n\tPressione qualquer tecla para voltar ao menu das listagens...");
-    _getch();
+    _getch(); // é so para esperar que o utilizador carregue numa tecla para voltar ao menu das listagens
 }
 
 void Listagem_livros_requisitados(Livro_t livro[], Requisicao_t requisicao[])
@@ -1539,6 +1544,7 @@ void save_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes)
 
 void gotoxy(int x, int y)
 {
+    // coloca o cursor na posicao x,y indicada
     COORD coord;
     coord.X = x;
     coord.Y = y;
