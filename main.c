@@ -559,6 +559,7 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
             printf("Data de nascimento deve ser inserida no formato dd/mm/aaaa\n");
             flag = 1;
         }
+        fflush(stdin);
         sscanf(leitor[leitor_count].data_nascimento, "%d/%d/%d", &dia, &mes, &ano); // guarda os digitos da data nas variaveis dia, mes e ano
         if (dia < 1 || dia > 31)                                                    // o dia so pode ser entre 1 e 31
         {
@@ -633,17 +634,17 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
         break;
     }
 
-    printf("\tDeseja Continuar? [S/N]\n");// pergunta se quer continuar a registar leitores
+    printf("\tDeseja Continuar? [S/N]\n"); // pergunta se quer continuar a registar leitores
 
     char sim_nao2 = S_or_N();
 
     if (sim_nao2 == 'S')
-    {// se a resposta for sim, retorna 1 e volta a registar leitores
+    { // se a resposta for sim, retorna 1 e volta a registar leitores
         menu = 1;
         return menu;
     }
     else if (sim_nao2 == 'N')
-    {// se a resposta for nao, retorna 0 e volta ao menu principal
+    { // se a resposta for nao, retorna 0 e volta ao menu principal
         menu = 0;
         return menu;
     }
@@ -889,7 +890,7 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
     if (mes_devolucao == 1 || mes_devolucao == 3 || mes_devolucao == 5 || mes_devolucao == 7 || mes_devolucao == 8 || mes_devolucao == 10 || mes_devolucao == 12)
     {
         if (dia_devolucao + dias_para_devolucao > 31) // se o dia de devolução for superior ao numero de dias do mes, o dia e acrescentado 15 e o mes e acrescentado 1
-        {//meses de 31 dias------------------------------------------------------
+        {                                             // meses de 31 dias------------------------------------------------------
             dia_devolucao = (dia_devolucao + dias_para_devolucao) - 31;
             if (mes_devolucao == 12) // se o mes for 12, o mes passa a ser 1 e o ano e acrescentado 1
             {
@@ -920,7 +921,7 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
     } // mes de fevereiro------------------------------------------------------
     else if (mes_devolucao == 2)
     {
-        if (dia_devolucao + dias_para_devolucao > 28) //se o dia de devolução for superior ao numero de dias do mes, o dia e acrescentado 15 e o mes e acrescentado 1
+        if (dia_devolucao + dias_para_devolucao > 28) // se o dia de devolução for superior ao numero de dias do mes, o dia e acrescentado 15 e o mes e acrescentado 1
         {
             dia_devolucao = (dia_devolucao + dias_para_devolucao) - 28;
             mes_devolucao = mes_devolucao + 1;
@@ -1111,9 +1112,10 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
     // sscanf(requisicao[indice_requisicao].data_requisicao_ano, "%d", &ano1);
 
     int dia2, mes2, ano2;                                                                  // variaveis para guardar a data de devolucao
+    fflush(stdin);                                                                       
     sscanf(requisicao[indice_requisicao].data_devolucao, "%d/%d/%d", &dia2, &mes2, &ano2); // guarda a data de devolucao na variavel dia2, mes2 e ano2
-    //printf("%s\n", requisicao[indice_requisicao].data_devolucao);
-    int dias1 = (dia1 - dia2) + ((mes1 - mes2) * 30) + ((ano1 - ano2) * 365);              // calcula os dias de utilizacao
+    // printf("%s\n", requisicao[indice_requisicao].data_devolucao);
+    int dias1 = (dia1 - dia2) + ((mes1 - mes2) * 30) + ((ano1 - ano2) * 365); // calcula os dias de utilizacao
     // printf("\tDias de utilizacao: %d\n", dias1);
     //  calcular dias de atraso e dar print------------------------------------------
     int dias_atraso = dias1 - 15; // calcula os dias de atraso
@@ -1123,8 +1125,9 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
     }
 
     printf("\t\tDias de atraso: %d\n\n", dias_atraso);
-    printf("\t\tDois euros por dia de atraso\n");
-    printf("\t\tValor a pagar: %d€\n\n ", dias_atraso * 2); // 2 euros por dia de atraso
+    printf("\t\tDois euros e meio por dia de atraso\n");
+    // float valor_pagar =  dias_atraso * 2.5;
+    printf("\t\tValor a pagar: %.2f $\n\n ", dias_atraso * 2.5); // 2,50 euros por dia de atraso
     // perguntar o estado do livro e alterar na estrutura livro e na estrutura requisicao
     printf("\tEstado do Livro: [1-inutilizavel/2-utilizavel]\n");
     fflush(stdin);
@@ -1136,6 +1139,7 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
         estado_flag1 = 0;
         estado_flag2 = 0;
         printf("\tResposta: ");
+        fflush(stdin);
         scanf("%d", &estado_livro);
 
         if (estado_livro == 1) // inutilizavel
