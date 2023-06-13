@@ -1,4 +1,5 @@
 /*
+ENUNCIADO--------------------------------------------------------------------------------
 Pretende-se elaborar um programa em linguagem C que apoie na gestão de requisições
 de livros de uma biblioteca por parte dos seus leitores. O programa deverá incluir a
 informação referente aos livros e aos leitores e garantir que, no máximo, existirão NLIVROS
@@ -51,10 +52,13 @@ carregados para o programa.
 */
 
 /*___________________________________________________________________________________________________________________________
-ENGENARIA ELECTROTECNICA E DE COMPUTADORES
-PROJETO DE PROGRAMACAO 1
-Pedro Ferreira-2222035
-Bernardo Santos-2222033
+
+                    ENGENHARIA ELETROTECNICA E DE COMPUTADORES
+                            PROJETO DE PROGRAMACAO I
+                                2022/2023
+
+            Pedro Ferreira   -  2222035  -  2222035@my.ipleiria.pt
+            Bernardo Santos  -  2222033  -  2222033@my.ipleiria.pt
 */
 //___________________________________________________________________________________________________________________________
 
@@ -143,7 +147,7 @@ int main()
     printf("   %c\n", 36);
 
     printf("%c\t\t\t Projeto de Programacao \t\t   %c\n", 36, 36);
-    printf("%c\t\t\t   de Computadores 1  \t\t\t   %c\n", 36, 36);
+    printf("%c\t\t\t   de Computadores I  \t\t\t   %c\n", 36, 36);
     printf("%c\t\t\t       2022/2023  \t\t\t   %c\n%c", 36, 36, 36);
     for (int i = 1; i < 9; i++)
     {
@@ -1506,8 +1510,8 @@ void Listagem_livros_requisitados(Livro_t livro[], Requisicao_t requisicao[])
 
     // apresenta todos os livros requisitados na estrutura de dados
 
-    //for (int i = 1; i < requisicao_count + 1; i++)
-    for(int i = 1; i < 21; i++)
+    // for (int i = 1; i < requisicao_count + 1; i++)
+    for (int i = 1; i < 21; i++)
     {
         // se numero leitor e o isbn forem 0 nao imprime
         if (strcmp(requisicao[i].codigo_leitor, "0") == 0 || strcmp(requisicao[i].ISBN, "0") == 0 || strcmp(requisicao[i].ISBN, "") == 0 || strcmp(requisicao[i].codigo_leitor, "") == 0)
@@ -1639,7 +1643,7 @@ void save_data(Livro_t *livros, Leitor_t *leitores, Requisicao_t *requisicoes)
     fclose(fileptr);
     printf("\n\tDados guardados com sucesso!\n\n");
 }
-
+/* ja nao e necessario
 void gotoxy(int x, int y)
 {
     // coloca o cursor na posicao x,y indicada
@@ -1648,7 +1652,7 @@ void gotoxy(int x, int y)
     coord.Y = y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
-
+*/
 char S_or_N(void)
 {
     // recebe S ou N e retorna S ou N
