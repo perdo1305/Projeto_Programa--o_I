@@ -176,7 +176,8 @@ int main()
     }
     printf("%c\n\n", 36);
 
-    sleep(3);
+    printf("\t\tPressione qualquer tecla para continuar...\n\n");
+    getch();
     system("cls");
 
     // ###############################################################################################################
@@ -401,21 +402,30 @@ char Registar_Livro(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao[
         // printf("\n %d", strlen(livro[livro_count].ISBN)); //DEBUGGING
 
         // Protecao ao ler o ISBN----------------------------------------------
-        if ((strlen(livro[livro_count].ISBN)) != 14)
+        // ISBN nao pode ser todo composto por apenas 0
+        if (strcmp(livro[livro_count].ISBN, "0000000000000") == 0)
+        {
+            printf("ISBN nao pode ser composto apenas por 0!\n");
+            flag = 1;
+        }
+        else if ((strlen(livro[livro_count].ISBN)) != 14)
         {
             printf("ISBN deve ter 13 digitos!\n");
             flag = 1;
         }
-
-        for (int i = 0; i < 13; i++)
+        else
         {
-            if (!isdigit(livro[livro_count].ISBN[i]))
+            for (int i = 0; i < 13; i++)
             {
-                printf("ISBN deve ser composto apenas por digitos!\n");
-                flag = 1;
-                break;
+                if (!isdigit(livro[livro_count].ISBN[i]))
+                {
+                    printf("ISBN deve ser composto apenas por digitos!\n");
+                    flag = 1;
+                    break;
+                }
             }
         }
+
         //--------------------------------------------------------------------
     } while (flag == 1);
 
@@ -521,9 +531,36 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
     leitor_count++;                // incrementa o leitor_count para guardar os dados no array na posicao correta
 
     // Le o codigo do leitor----------------------------------------------
-    printf("\n\n\t%c Codigo de Leitor: ", 175);
-    fflush(stdin);
-    fgets(leitor[leitor_count].codigo_leitor, sizeof(leitor->codigo_leitor), stdin);
+    char leitor_num_compare[100];
+    do
+    {
+        flag = 0;
+        printf("\n\n\t%c Codigo de Leitor: ", 175);
+        fflush(stdin);
+
+        fgets(leitor_num_compare, sizeof(leitor_num_compare), stdin);
+        // fgets(leitor[leitor_count].codigo_leitor, sizeof(leitor->codigo_leitor), stdin);
+        //  codigo de leitor deve ser diferente de 0 ou multiplos 0
+        if (strcmp(leitor_num_compare, "0\n") == 0 || strcmp(leitor_num_compare, "00\n") == 0 || strcmp(leitor_num_compare, "000\n") == 0 || strcmp(leitor_num_compare, "0000\n") == 0 || strcmp(leitor_num_compare, "00000\n") == 0 || strcmp(leitor_num_compare, "000000\n") == 0 || strcmp(leitor_num_compare, "0000000\n") == 0 || strcmp(leitor_num_compare, "00000000\n") == 0)
+        {
+            printf("\n\tCodigo de Leitor Invalido!\n");
+            flag = 1;
+        }
+        else
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                if (strcmp(leitor_num_compare, leitor[i].codigo_leitor) == 0)
+                {
+                    printf("\n\tCodigo de Leitor ja existente!\n");
+                    flag = 1;
+                    break;
+                }
+            }
+        }
+    } while (flag == 1);
+    strcpy(leitor[leitor_count].codigo_leitor, leitor_num_compare);
+
     //--------------------------------------------------------------------
     // Le o nome do leitor----------------------------------------------
     printf("\t%c Nome: ", 175);
@@ -547,17 +584,20 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
             printf("Data de nascimento deve ser inserida no formato dd/mm/aaaa\n");
             flag = 1;
         }
-        for (int i = 0; i < 12; i++)
+        else
         {
-            if (leitor[leitor_count].data_nascimento[i] == '/')
+            for (int i = 0; i < 12; i++)
             {
-                barra_count++; // conta o numero de barras
+                if (leitor[leitor_count].data_nascimento[i] == '/')
+                {
+                    barra_count++; // conta o numero de barras
+                }
             }
-        }
-        if (barra_count != 2) // se o numero de barras for diferente de 2, a data nao e valida
-        {
-            printf("Data de nascimento deve ser inserida no formato dd/mm/aaaa\n");
-            flag = 1;
+            if (barra_count != 2) // se o numero de barras for diferente de 2, a data nao e valida
+            {
+                printf("Data de nascimento deve ser inserida no formato dd/mm/aaaa\n");
+                flag = 1;
+            }
         }
         fflush(stdin);
         sscanf(leitor[leitor_count].data_nascimento, "%d/%d/%d", &dia, &mes, &ano); // guarda os digitos da data nas variaveis dia, mes e ano
@@ -586,6 +626,7 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
     //--------------------------------------------------------------------
 
     // o numero de telefone deve ser inserido no formato 9xxxxxxxx e tem de ter 9 digitos
+    // e se é so composto por numeros
     int flag2; // flag para verificar se o numero de telefone e valido
     do
     {
@@ -600,9 +641,22 @@ char Registar_Leitor(Livro_t livro[], Leitor_t leitor[], Requisicao_t requisicao
 
         if (strlen(leitor[leitor_count].contato_telefonico) != 10) // verifica se o numero de telefone tem 10-1=9 digitos
         {
-            printf("Numero de telefone deve ser inserido no formato 9xxxxxxxx\n");
+            printf("Numero de telefone deve ter 9 digitos\n");
             flag2 = 1;
         }
+        else
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                if (!isdigit(leitor[leitor_count].contato_telefonico[i]))
+                {
+                    printf("Numero de telefone deve ser composto apenas por numeros\n");
+                    flag2 = 1;
+                    break;
+                }
+            }
+        }
+
     } while (flag2 == 1);
 
     // printf("\t%c Email: **\n\n",175);
@@ -697,6 +751,14 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
         printf("\t\tCodigo: %s\n", leitor[i].codigo_leitor);
     }
     //--------------------------------------------------------------------
+    if (leitor_count == 0)
+    {
+        printf("\t\tNao existem leitores registados!\n");
+        printf("\t\tPressione qualquer tecla para voltar ao menu principal\n");
+        requisicao_count--;
+        getch();
+        return 0;
+    }
 
     printf("\n\tInserir Codigo do Leitor:");
 
@@ -726,21 +788,38 @@ char Requisitar_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisica
     if (flag == 0 || leitor_count == 0)
     {
         printf("\tCodigo de Leitor N%co Encontrado!\n", 198);
-        printf("\tA voltar ao menu principal...");
-        sleep(4);
+        printf("\tPressione qualquer tecla para voltar ao menu principal...");
+        getch();
         menu = 0;
         return menu;
     }
     //--------------------------------------------------------------------
 
     flag = 0;
-
+    int count_livros = 0;
     // imprime os codigos dos livros disponiveis
     printf("\t\nCodigos de livro disponiveis:\n");
     // Percorrer o array de livros e imprimir os codigos------------------
     for (int i = 1; i < livro_count + 1; i++)
     {
-        printf("\t\tCodigo: %s\n", livro[i].ISBN);
+        // um livro só pode ser requisitado se não estiver requisitado por outro leitor
+        // se a estruta livro[i].estado for igual a 'D' significa que o livro esta disponivel
+
+        if (strcmp(livro[i].estado, "D") == 0)
+        {
+
+            printf("\t\tCodigo: %s\n", livro[i].ISBN);
+            count_livros++;
+        }
+    }
+    if (count_livros == 0)
+    {
+        printf("\tNao existem livros disponiveis para requisitar!\n");
+        printf("\tPressione qualquer tecla para voltar ao menu principal...");
+        getch();
+        requisicao_count--;
+        menu = 0;
+        return menu;
     }
     printf("\n\tInserir Codigo do Livro:");
     //--------------------------------------------------------------------
@@ -1063,6 +1142,13 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
         {
             printf("\t\tCodigo: %s\n", requisicao[i].ISBN);
         }
+        if (requisicao_count == 0)
+        {
+            printf("\t\tNao existem livros requisitados!\n");
+            printf("\t\tPressione qualquer tecla para voltar ao menu principal!\n");
+            getch();
+            return 0;
+        }
         //--------------------------------------------------------------------------
         // inserir codigo do livro---------------------------------------------------
         printf("\n\tInserir Codigo do Livro:");
@@ -1111,8 +1197,8 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
     // sscanf(requisicao[indice_requisicao].data_requisicao_mes, "%d", &mes1);
     // sscanf(requisicao[indice_requisicao].data_requisicao_ano, "%d", &ano1);
 
-    int dia2, mes2, ano2;                                                                  // variaveis para guardar a data de devolucao
-    fflush(stdin);                                                                       
+    int dia2, mes2, ano2; // variaveis para guardar a data de devolucao
+    fflush(stdin);
     sscanf(requisicao[indice_requisicao].data_devolucao, "%d/%d/%d", &dia2, &mes2, &ano2); // guarda a data de devolucao na variavel dia2, mes2 e ano2
     // printf("%s\n", requisicao[indice_requisicao].data_devolucao);
     int dias1 = (dia1 - dia2) + ((mes1 - mes2) * 30) + ((ano1 - ano2) * 365); // calcula os dias de utilizacao
@@ -1187,7 +1273,7 @@ char Devolver_Livro(Leitor_t leitor[], Livro_t livro[], Requisicao_t requisicao[
         strcpy(requisicao[indice_requisicao].estado_livro, "0");
 
         requisicao_count--;
-
+        fflush(stdin);
         printf("\tDevolucao confirmada!\n");
         save_data(livro, leitor, requisicao);
     }
@@ -1403,7 +1489,7 @@ void Listagem_livros_requisitados(Livro_t livro[], Requisicao_t requisicao[])
         printf("\t");
     }
     printf("   %c\n", 186);
-    printf("%c\t\t\t-- Lista de Livros Requisitados --\t   %c\n", 186, 186);
+    printf("%c\t\t-- Lista de Livros Requisitados --\t\t   %c\n", 186, 186);
     printf("%c", 186);
     for (uint8_t i = 1; i < 9; i++)
     {
@@ -1420,13 +1506,22 @@ void Listagem_livros_requisitados(Livro_t livro[], Requisicao_t requisicao[])
 
     // apresenta todos os livros requisitados na estrutura de dados
 
-    for (int i = 1; i < requisicao_count + 1; i++)
+    //for (int i = 1; i < requisicao_count + 1; i++)
+    for(int i = 1; i < 21; i++)
     {
-        printf("Numero de leitor: %s\n", requisicao[i].codigo_leitor);
-        printf("ISBN: %s\n", requisicao[i].ISBN);
-        printf("Data de requisicao: %d/%d/%d\n\n", atoi(requisicao[i].data_requisicao_dia), atoi(requisicao[i].data_requisicao_mes), atoi(requisicao[i].data_requisicao_ano));
-        printf("Data de devolucao: %s\n", requisicao[i].data_devolucao);
-        printf("-----------------------------\n");
+        // se numero leitor e o isbn forem 0 nao imprime
+        if (strcmp(requisicao[i].codigo_leitor, "0") == 0 || strcmp(requisicao[i].ISBN, "0") == 0 || strcmp(requisicao[i].ISBN, "") == 0 || strcmp(requisicao[i].codigo_leitor, "") == 0)
+        {
+            continue;
+        }
+        else
+        {
+            printf("Numero de leitor: %s\n", requisicao[i].codigo_leitor);
+            printf("ISBN: %s\n", requisicao[i].ISBN);
+            printf("Data de requisicao: %d/%d/%d\n\n", atoi(requisicao[i].data_requisicao_dia), atoi(requisicao[i].data_requisicao_mes), atoi(requisicao[i].data_requisicao_ano));
+            printf("Data de devolucao: %s\n", requisicao[i].data_devolucao);
+            printf("-----------------------------\n");
+        }
     }
     if (requisicao_count == 0)
     {
@@ -1473,13 +1568,12 @@ void Listagem_ultimas_requisicoes(Leitor_t leitor[], Livro_t livro[], Requisicao
     {
         printf("Numero de leitor: %s\n", leitor[i].codigo_leitor);
 
-        for (int j = 0; j < 9; j++)
+        for (int j = 0; j < 10; j++)
         {
             // indice_livro = atoi(leitor[i].historico_requisicoes[j]);
             if (atoi(livro[leitor[i].historico_requisicoes[j]].ISBN) == 0)
             {
                 printf("[%d] -----\n", j + 1);
-                printf("\t%s\n", livro[leitor[i].historico_requisicoes[j]].titulo);
             }
             else
             {
